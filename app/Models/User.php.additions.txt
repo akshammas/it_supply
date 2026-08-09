@@ -1,0 +1,33 @@
+Add these to the default app/Models/User.php that Laravel generates:
+
+1. Add to $fillable:
+    'role',
+    'status',
+    'last_login_at',
+
+2. Add to $casts() function (or protected $casts array):
+    'last_login_at' => 'datetime',
+
+3. Add helper methods inside the class:
+
+    public function isSuperAdmin(): bool
+    {
+        return $this->role === 'super_admin';
+    }
+
+    public function activityLogs()
+    {
+        return $this->hasMany(\App\Models\AdminActivityLog::class);
+    }
+
+    public function quotes()
+    {
+        return $this->hasMany(\App\Models\Quote::class, 'created_by');
+    }
+
+Suggested role values (stored as a plain string column for now — swap for a
+spatie/laravel-permission package later if you need granular permissions):
+    super_admin
+    product_manager
+    sales
+    content_manager
