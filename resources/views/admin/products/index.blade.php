@@ -61,7 +61,7 @@
                     @foreach($products as $product)
                         <tr>
                             <td><input type="checkbox" name="ids[]" value="{{ $product->id }}" class="row-check" form="bulk-form"></td>
-                            <td>{{ $product->name }}<div class="text-muted small">{{ $product->sku }}</div></td>
+                            <td>{{ $product->name }}@if($product->sku)<div class="text-muted small">{{ $product->sku }}</div>@endif</td>
                             <td>{{ $product->brand?->name ?? '—' }}</td>
                             <td>{{ $product->category?->name ?? '—' }}</td>
                             <td>

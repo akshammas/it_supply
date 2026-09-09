@@ -66,6 +66,8 @@ class Product extends Model
 
     public function whatsappMessage(): string
     {
-        return "Hello,\n\nI am interested in:\n\nProduct: {$this->name}\nSKU: {$this->sku}\n\nPlease provide price and availability.\n\nThank you.";
+        $skuLine = $this->sku ? "SKU: {$this->sku}\n" : '';
+
+        return "Hello,\n\nI am interested in:\n\nProduct: {$this->name}\n{$skuLine}\nPlease provide price and availability.\n\nThank you.";
     }
 }

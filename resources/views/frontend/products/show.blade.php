@@ -80,13 +80,23 @@
                    target="_blank" class="btn btn-success">
                     <i class="bi bi-whatsapp me-1"></i> WhatsApp Enquiry
                 </a>
-                {{-- Enquiry cart + Request Quote submission are wired up in Phase 5 --}}
-                <button type="button" class="btn btn-primary" disabled title="Coming in Phase 5">
+                <a href="{{ route('quote-request.create') }}" class="btn btn-primary" onclick="document.getElementById('quickAddForm').submit(); return false;">
                     <i class="bi bi-file-earmark-text me-1"></i> Request Quote
-                </button>
-                <button type="button" class="btn btn-outline-primary" disabled title="Coming in Phase 5">
-                    <i class="bi bi-cart-plus me-1"></i> Add to Enquiry
-                </button>
+                </a>
+                <form method="POST" action="{{ route('enquiry.add', $product) }}" class="d-inline-flex align-items-center gap-2">
+                    @csrf
+                    <input type="number" name="quantity" value="1" min="1" class="form-control form-control-sm" style="width:70px">
+                    <button type="submit" class="btn btn-outline-primary">
+                        <i class="bi bi-cart-plus me-1"></i> Add to Enquiry
+                    </button>
+                </form>
+                {{-- "Request Quote" quick-adds this product then jumps straight to the
+                     quote form, without forcing the customer through the cart page first --}}
+                <form id="quickAddForm" method="POST" action="{{ route('enquiry.add', $product) }}" class="d-none">
+                    @csrf
+                    <input type="hidden" name="quantity" value="1">
+                    <input type="hidden" name="redirect_to_quote" value="1">
+                </form>
             </div>
 
             @if($product->variants->isNotEmpty())
@@ -160,6 +170,6 @@
 <div class="d-md-none fixed-bottom bg-white border-top p-2 d-flex gap-2">
     <a href="https://wa.me/{{ config('services.whatsapp.number', '971500000000') }}?text={{ urlencode($product->whatsappMessage()) }}"
        target="_blank" class="btn btn-success flex-fill">WhatsApp</a>
-    <button type="button" class="btn btn-primary flex-fill" disabled>Request Quote</button>
+    <button type="button" class="btn btn-primary flex-fill" onclick="document.getElementById('quickAddForm').submit()">Request Quote</button>
 </div>
 @endsection

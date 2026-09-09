@@ -19,7 +19,7 @@ class StoreProductRequest extends FormRequest
             'category_id' => ['nullable', 'exists:categories,id'],
             'name' => ['required', 'string', 'max:255'],
             'slug' => ['nullable', 'string', 'max:255', Rule::unique('products', 'slug')],
-            'sku' => ['required', 'string', 'max:100', Rule::unique('products', 'sku')],
+            'sku' => ['nullable', 'string', 'max:100', Rule::unique('products', 'sku')],
             'model_number' => ['nullable', 'string', 'max:100'],
             'short_description' => ['nullable', 'string', 'max:500'],
             'description' => ['nullable', 'string'],

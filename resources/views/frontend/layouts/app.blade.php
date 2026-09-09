@@ -50,8 +50,15 @@
                 </li>
                 <li class="nav-item"><a class="nav-link" href="#">Solutions</a></li>
                 <li class="nav-item"><a class="nav-link" href="#">About</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Contact</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ route('contact.create') }}">Contact</a></li>
             </ul>
+            <a href="{{ route('enquiry.index') }}" class="btn btn-outline-secondary position-relative me-3">
+                <i class="bi bi-cart3"></i>
+                @php($cartCount = app(\App\Services\EnquiryCartService::class)->count())
+                @if($cartCount > 0)
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">{{ $cartCount }}</span>
+                @endif
+            </a>
             <form action="{{ route('search') }}" method="GET" class="d-flex" role="search">
                 <input type="search" name="q" value="{{ request('q') }}" class="form-control" placeholder="Search products...">
                 <button class="btn btn-outline-primary ms-2"><i class="bi bi-search"></i></button>
@@ -76,7 +83,7 @@
                 <ul class="list-unstyled small">
                     <li><a href="{{ route('products.index') }}" class="text-white-50 text-decoration-none">Products</a></li>
                     <li><a href="#" class="text-white-50 text-decoration-none">About Us</a></li>
-                    <li><a href="#" class="text-white-50 text-decoration-none">Contact</a></li>
+                    <li><a href="{{ route('contact.create') }}" class="text-white-50 text-decoration-none">Contact</a></li>
                 </ul>
             </div>
             <div class="col-md-4 mb-3">

@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\Auth\AdminAuthenticatedSessionController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\EnquiryController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\SpecificationController;
 use App\Http\Controllers\Admin\SpecificationGroupController;
@@ -13,10 +14,8 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 | Admin Routes
 |--------------------------------------------------------------------------
-| Full replacement for the Phase 2 admin.php — includes the Phase 2 auth
-| routes plus Phase 3's catalogue CRUD (Products, Categories, Brands,
-| Specifications). Require this file from routes/web.php:
-|   require __DIR__.'/admin.php';
+| Full replacement for the Phase 3 admin.php — adds the Enquiries screen
+| (Phase 5). Everything from Phase 2/3 (auth, catalogue CRUD) is unchanged.
 */
 
 Route::prefix('admin')->name('admin.')->group(function () {
@@ -54,7 +53,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::delete('products/{product}/images/{image}', [ProductController::class, 'deleteImage'])->name('products.images.destroy');
         Route::post('products/{product}/images/{image}/primary', [ProductController::class, 'setPrimaryImage'])->name('products.images.primary');
 
-        // Phase 4+ will add: enquiries, quotes, customers, solutions,
-        // blog, pages, banners, users, settings, CSV import.
+        Route::get('enquiries', [EnquiryController::class, 'index'])->name('enquiries.index');
+        Route::get('enquiries/{enquiry}', [EnquiryController::class, 'show'])->name('enquiries.show');
+        Route::put('enquiries/{enquiry}/status', [EnquiryController::class, 'updateStatus'])->name('enquiries.status');
+
+        // Phase 6+ will add: customers, quotes, solutions, blog, pages,
+        // banners, users, settings, CSV import.
     });
 });

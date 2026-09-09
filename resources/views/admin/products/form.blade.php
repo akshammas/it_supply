@@ -35,8 +35,8 @@
                         <div class="col-md-6"><label class="form-label">Slug</label>
                             <input type="text" name="slug" value="{{ old('slug', $product->slug) }}" class="form-control" placeholder="Auto-generated if blank"></div>
 
-                        <div class="col-md-4"><label class="form-label">SKU *</label>
-                            <input type="text" name="sku" value="{{ old('sku', $product->sku) }}" class="form-control" required></div>
+                        <div class="col-md-4"><label class="form-label">SKU</label>
+                            <input type="text" name="sku" value="{{ old('sku', $product->sku) }}" class="form-control"></div>
                         <div class="col-md-4"><label class="form-label">Model Number</label>
                             <input type="text" name="model_number" value="{{ old('model_number', $product->model_number) }}" class="form-control"></div>
                         <div class="col-md-4"><label class="form-label">Condition *</label>

@@ -27,7 +27,7 @@
 <li class="nav-item"><a href="#" class="nav-link text-white-50"><i class="bi bi-upload me-2"></i>Import / Export</a></li>
 
             <li class="nav-item mt-2"><span class="text-uppercase small text-white-50">Sales</span></li>
-            <li class="nav-item"><a href="#" class="nav-link text-white-50"><i class="bi bi-envelope me-2"></i>Enquiries</a></li>
+            <li class="nav-item"><a href="{{ route('admin.enquiries.index') }}" class="nav-link text-white-50"><i class="bi bi-envelope me-2"></i>Enquiries</a></li>
             <li class="nav-item"><a href="#" class="nav-link text-white-50"><i class="bi bi-people me-2"></i>Customers</a></li>
             <li class="nav-item"><a href="#" class="nav-link text-white-50"><i class="bi bi-file-earmark-text me-2"></i>Quotes</a></li>
 
