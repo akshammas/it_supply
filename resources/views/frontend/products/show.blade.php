@@ -76,7 +76,7 @@
             @endif
 
             <div class="d-flex flex-wrap gap-2 mb-4">
-                <a href="https://wa.me/{{ config('services.whatsapp.number', '971500000000') }}?text={{ urlencode($product->whatsappMessage()) }}"
+                <a href="https://wa.me/{{ \App\Models\Setting::get('whatsapp_number', '971500000000') }}?text={{ urlencode($product->whatsappMessage()) }}"
                    target="_blank" class="btn btn-success">
                     <i class="bi bi-whatsapp me-1"></i> WhatsApp Enquiry
                 </a>

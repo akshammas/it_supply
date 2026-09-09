@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', config('app.name'))</title>
-    <meta name="description" content="@yield('meta_description', 'Enterprise IT products and solutions for businesses across the UAE.')">
+    <title>@yield('title', \App\Models\Setting::get('seo_title', config('app.name')))</title>
+<meta name="description" content="@yield('meta_description', \App\Models\Setting::get('seo_description', 'Enterprise IT products and solutions for businesses across the UAE.'))">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -75,7 +75,7 @@
     <div class="container">
         <div class="row">
             <div class="col-md-4 mb-3">
-                <h5 class="text-white">{{ config('app.name') }}</h5>
+                <h5 class="text-white">{{ \App\Models\Setting::get('company_name', config('app.name')) }}</h5>
                 <p class="small">Enterprise IT products and solutions for businesses across the UAE.</p>
             </div>
             <div class="col-md-4 mb-3">
@@ -88,7 +88,7 @@
             </div>
             <div class="col-md-4 mb-3">
                 <h6 class="text-white">Get in Touch</h6>
-                <p class="small mb-0">UAE | Dubai</p>
+                <p class="small mb-0">{{ \App\Models\Setting::get('address', 'UAE | Dubai') }}</p>
             </div>
         </div>
         <hr class="border-secondary">
@@ -96,7 +96,7 @@
     </div>
 </footer>
 
-<a href="https://wa.me/{{ config('services.whatsapp.number', '971500000000') }}" target="_blank" class="whatsapp-float">
+<a href="https://wa.me/{{ \App\Models\Setting::get('whatsapp_number', '971500000000') }}" target="_blank" class="whatsapp-float">
     <i class="bi bi-whatsapp me-1"></i> WhatsApp Us
 </a>
 

@@ -6,8 +6,8 @@
     {{-- HERO --}}
     <section class="bg-dark text-white py-5">
         <div class="container text-center py-4">
-            <h1 class="display-5 fw-bold">Enterprise IT Products & Solutions</h1>
-            <p class="lead text-white-50">For Businesses Across UAE</p>
+            <h1 class="display-5 fw-bold">{{ \App\Models\Setting::get('hero_title', 'Enterprise IT Products & Solutions') }}</h1>
+            <p class="lead text-white-50">{{ \App\Models\Setting::get('hero_subtitle', 'For Businesses Across UAE') }}</p>
             <p class="mb-4">Servers &middot; Networking &middot; Security &middot; POS &middot; Access Control</p>
             <a href="{{ route('products.index') }}" class="btn btn-light btn-lg me-2">Explore Products</a>
             <a href="{{ route('products.index') }}" class="btn btn-outline-light btn-lg">Request a Quote</a>

@@ -1,11 +1,18 @@
 <?php
 
 use App\Http\Controllers\Admin\Auth\AdminAuthenticatedSessionController;
+use App\Http\Controllers\Admin\BannerController;
+use App\Http\Controllers\Admin\BlogCategoryController;
+use App\Http\Controllers\Admin\BlogController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EnquiryController;
+use App\Http\Controllers\Admin\PageController;
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\QuoteController;
+use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\Admin\SolutionController;
 use App\Http\Controllers\Admin\SpecificationController;
 use App\Http\Controllers\Admin\SpecificationGroupController;
 use Illuminate\Support\Facades\Route;
@@ -14,8 +21,9 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 | Admin Routes
 |--------------------------------------------------------------------------
-| Full replacement for the Phase 3 admin.php — adds the Enquiries screen
-| (Phase 5). Everything from Phase 2/3 (auth, catalogue CRUD) is unchanged.
+| Full replacement for the Phase 6 admin.php — adds Solutions, Blog,
+| Pages, Banners, Settings (Phase 7). Everything from Phase 2/3/5/6 is
+| unchanged.
 */
 
 Route::prefix('admin')->name('admin.')->group(function () {
@@ -56,8 +64,27 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('enquiries', [EnquiryController::class, 'index'])->name('enquiries.index');
         Route::get('enquiries/{enquiry}', [EnquiryController::class, 'show'])->name('enquiries.show');
         Route::put('enquiries/{enquiry}/status', [EnquiryController::class, 'updateStatus'])->name('enquiries.status');
+        Route::post('enquiries/{enquiry}/create-quote', [QuoteController::class, 'createFromEnquiry'])->name('quotes.create-from-enquiry');
 
-        // Phase 6+ will add: customers, quotes, solutions, blog, pages,
-        // banners, users, settings, CSV import.
+        Route::get('quotes', [QuoteController::class, 'index'])->name('quotes.index');
+        Route::get('quotes/{quote}', [QuoteController::class, 'show'])->name('quotes.show');
+        Route::get('quotes/{quote}/edit', [QuoteController::class, 'edit'])->name('quotes.edit');
+        Route::put('quotes/{quote}', [QuoteController::class, 'update'])->name('quotes.update');
+        Route::put('quotes/{quote}/status', [QuoteController::class, 'updateStatus'])->name('quotes.status');
+        Route::get('quotes/{quote}/pdf', [QuoteController::class, 'pdf'])->name('quotes.pdf');
+
+        Route::resource('solutions', SolutionController::class)->except('show');
+
+        Route::resource('blog', BlogController::class)->except('show')->parameters(['blog' => 'post']);
+        Route::post('blog-categories', [BlogCategoryController::class, 'store'])->name('blog-categories.store');
+        Route::delete('blog-categories/{blogCategory}', [BlogCategoryController::class, 'destroy'])->name('blog-categories.destroy');
+
+        Route::resource('pages', PageController::class)->except('show');
+        Route::resource('banners', BannerController::class)->except('show');
+
+        Route::get('settings', [SettingController::class, 'edit'])->name('settings.edit');
+        Route::put('settings', [SettingController::class, 'update'])->name('settings.update');
+
+        // Phase 8+ will add: customers list, CSV import, users management.
     });
 });

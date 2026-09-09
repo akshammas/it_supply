@@ -20,11 +20,11 @@
             <li class="nav-item"><a href="{{ route('admin.dashboard') }}" class="nav-link text-white"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a></li>
 
             <li class="nav-item mt-2"><span class="text-uppercase small text-white-50">Catalogue</span></li>
-<li class="nav-item"><a href="{{ route('admin.products.index') }}" class="nav-link {{ request()->routeIs('admin.products.*') ? 'text-white' : 'text-white-50' }}"><i class="bi bi-box-seam me-2"></i>Products</a></li>
-<li class="nav-item"><a href="{{ route('admin.categories.index') }}" class="nav-link {{ request()->routeIs('admin.categories.*') ? 'text-white' : 'text-white-50' }}"><i class="bi bi-diagram-3 me-2"></i>Categories</a></li>
-<li class="nav-item"><a href="{{ route('admin.brands.index') }}" class="nav-link {{ request()->routeIs('admin.brands.*') ? 'text-white' : 'text-white-50' }}"><i class="bi bi-award me-2"></i>Brands</a></li>
-<li class="nav-item"><a href="{{ route('admin.specifications.index') }}" class="nav-link {{ request()->routeIs('admin.specifications.*') ? 'text-white' : 'text-white-50' }}"><i class="bi bi-list-check me-2"></i>Specifications</a></li>
-<li class="nav-item"><a href="#" class="nav-link text-white-50"><i class="bi bi-upload me-2"></i>Import / Export</a></li>
+            <li class="nav-item"><a href="{{ route('admin.products.index') }}" class="nav-link {{ request()->routeIs('admin.products.*') ? 'text-white' : 'text-white-50' }}"><i class="bi bi-box-seam me-2"></i>Products</a></li>
+            <li class="nav-item"><a href="{{ route('admin.categories.index') }}" class="nav-link {{ request()->routeIs('admin.categories.*') ? 'text-white' : 'text-white-50' }}"><i class="bi bi-diagram-3 me-2"></i>Categories</a></li>
+            <li class="nav-item"><a href="{{ route('admin.brands.index') }}" class="nav-link {{ request()->routeIs('admin.brands.*') ? 'text-white' : 'text-white-50' }}"><i class="bi bi-award me-2"></i>Brands</a></li>
+            <li class="nav-item"><a href="{{ route('admin.specifications.index') }}" class="nav-link {{ request()->routeIs('admin.specifications.*') ? 'text-white' : 'text-white-50' }}"><i class="bi bi-list-check me-2"></i>Specifications</a></li>
+            <li class="nav-item"><a href="#" class="nav-link text-white-50"><i class="bi bi-upload me-2"></i>Import / Export</a></li>
 
             <li class="nav-item mt-2"><span class="text-uppercase small text-white-50">Sales</span></li>
             <li class="nav-item"><a href="{{ route('admin.enquiries.index') }}" class="nav-link text-white-50"><i class="bi bi-envelope me-2"></i>Enquiries</a></li>
@@ -32,16 +32,16 @@
             <li class="nav-item"><a href="#" class="nav-link text-white-50"><i class="bi bi-file-earmark-text me-2"></i>Quotes</a></li>
 
             <li class="nav-item mt-2"><span class="text-uppercase small text-white-50">Content</span></li>
-            <li class="nav-item"><a href="#" class="nav-link text-white-50"><i class="bi bi-lightbulb me-2"></i>Solutions</a></li>
-            <li class="nav-item"><a href="#" class="nav-link text-white-50"><i class="bi bi-journal-text me-2"></i>Blog</a></li>
-            <li class="nav-item"><a href="#" class="nav-link text-white-50"><i class="bi bi-file-earmark me-2"></i>Pages</a></li>
-            <li class="nav-item"><a href="#" class="nav-link text-white-50"><i class="bi bi-images me-2"></i>Banners</a></li>
+            <li class="nav-item"><a href="{{ route('admin.solutions.index') }}" class="nav-link text-white-50"><i class="bi bi-lightbulb me-2"></i>Solutions</a></li>
+            <li class="nav-item"><a href="{{ route('admin.blog.index') }}" class="nav-link text-white-50"><i class="bi bi-journal-text me-2"></i>Blog</a></li>
+            <li class="nav-item"><a href="{{ route('admin.pages.index') }}" class="nav-link text-white-50"><i class="bi bi-file-earmark me-2"></i>Pages</a></li>
+            <li class="nav-item"><a href="{{ route('admin.banners.index') }}" class="nav-link text-white-50"><i class="bi bi-images me-2"></i>Banners</a></li>
 
             <li class="nav-item mt-2"><span class="text-uppercase small text-white-50">System</span></li>
             @if(auth()->user()?->role === 'super_admin')
             <li class="nav-item"><a href="#" class="nav-link text-white-50"><i class="bi bi-person-badge me-2"></i>Admin Users</a></li>
             @endif
-            <li class="nav-item"><a href="#" class="nav-link text-white-50"><i class="bi bi-gear me-2"></i>Settings</a></li>
+            <li class="nav-item"><a href="{{ route('admin.settings.edit') }}" class="nav-link text-white-50"><i class="bi bi-gear me-2"></i>Settings</a></li>
         </ul>
         <hr>
         <div class="dropdown">

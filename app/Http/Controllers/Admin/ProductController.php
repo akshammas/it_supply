@@ -164,14 +164,21 @@ class ProductController extends Controller
     {
         $filename = 'products-'.now()->format('Y-m-d-His').'.csv';
 
-        $columns = ['id', 'name', 'sku', 'model_number', 'brand', 'category', 'price', 'price_type', 'stock', 'status'];
+        $columns = ['id', 'name', 'sku', 'model_number', 'brand', 'category', 'price', 'price_type', 'stock', 'status', 'image'];
 
         return response()->streamDownload(function () use ($columns) {
             $handle = fopen('php://output', 'w');
             fputcsv($handle, $columns);
 
-            Product::with(['brand', 'category'])->orderBy('id')->chunk(200, function ($products) use ($handle) {
+            Product::with(['brand', 'category', 'images'])->orderBy('id')->chunk(200, function ($products) use ($handle) {
                 foreach ($products as $product) {
+                    // Primary image first, then the rest — one comma-separated
+                    // "image" column, matching the CSV import format (section 28).
+                    $orderedImages = $product->images
+                        ->sortByDesc('is_primary')
+                        ->map(fn ($img) => asset('storage/'.$img->image))
+                        ->implode(',');
+
                     fputcsv($handle, [
                         $product->id,
                         $product->name,
@@ -183,6 +190,7 @@ class ProductController extends Controller
                         $product->price_type,
                         $product->stock,
                         $product->status ? 'active' : 'inactive',
+                        $orderedImages,
                     ]);
                 }
             });
