@@ -24,7 +24,7 @@
             <li class="nav-item"><a href="{{ route('admin.categories.index') }}" class="nav-link {{ request()->routeIs('admin.categories.*') ? 'text-white' : 'text-white-50' }}"><i class="bi bi-diagram-3 me-2"></i>Categories</a></li>
             <li class="nav-item"><a href="{{ route('admin.brands.index') }}" class="nav-link {{ request()->routeIs('admin.brands.*') ? 'text-white' : 'text-white-50' }}"><i class="bi bi-award me-2"></i>Brands</a></li>
             <li class="nav-item"><a href="{{ route('admin.specifications.index') }}" class="nav-link {{ request()->routeIs('admin.specifications.*') ? 'text-white' : 'text-white-50' }}"><i class="bi bi-list-check me-2"></i>Specifications</a></li>
-            <li class="nav-item"><a href="#" class="nav-link text-white-50"><i class="bi bi-upload me-2"></i>Import / Export</a></li>
+            <li class="nav-item"><a href="{{ route('admin.imports.create') }}" class="nav-link text-white-50"><i class="bi bi-upload me-2"></i>Import / Export</a></li>
 
             <li class="nav-item mt-2"><span class="text-uppercase small text-white-50">Sales</span></li>
             <li class="nav-item"><a href="{{ route('admin.enquiries.index') }}" class="nav-link text-white-50"><i class="bi bi-envelope me-2"></i>Enquiries</a></li>

@@ -54,7 +54,7 @@
                 <a href="{{ route('brands.show', $product->brand) }}" class="text-decoration-none text-muted small text-uppercase">{{ $product->brand->name }}</a>
             @endif
             <h1 class="h3">{{ $product->name }}</h1>
-            <div class="text-muted small mb-3">SKU: {{ $product->sku }} @if($product->model_number) &middot; Model: {{ $product->model_number }} @endif</div>
+            <div class="text-muted small mb-3">@if($product->sku) SKU: {{ $product->sku }} @endif @if($product->model_number) &middot; Model: {{ $product->model_number }} @endif</div>
 
             <div class="mb-3">
                 @if($product->price_type === 'on_request')
@@ -90,8 +90,6 @@
                         <i class="bi bi-cart-plus me-1"></i> Add to Enquiry
                     </button>
                 </form>
-                {{-- "Request Quote" quick-adds this product then jumps straight to the
-                     quote form, without forcing the customer through the cart page first --}}
                 <form id="quickAddForm" method="POST" action="{{ route('enquiry.add', $product) }}" class="d-none">
                     @csrf
                     <input type="hidden" name="quantity" value="1">
@@ -168,7 +166,7 @@
 
 {{-- Mobile sticky action bar (section 53) --}}
 <div class="d-md-none fixed-bottom bg-white border-top p-2 d-flex gap-2">
-    <a href="https://wa.me/{{ config('services.whatsapp.number', '971500000000') }}?text={{ urlencode($product->whatsappMessage()) }}"
+    <a href="https://wa.me/{{ \App\Models\Setting::get('whatsapp_number', '971500000000') }}?text={{ urlencode($product->whatsappMessage()) }}"
        target="_blank" class="btn btn-success flex-fill">WhatsApp</a>
     <button type="button" class="btn btn-primary flex-fill" onclick="document.getElementById('quickAddForm').submit()">Request Quote</button>
 </div>

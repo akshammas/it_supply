@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Models\Banner;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
@@ -31,6 +32,15 @@ class HomeController extends Controller
                 ->get(),
             'solutions' => Solution::where('status', true)
                 ->take(6)
+                ->get(),
+            'heroBanner' => Banner::where('position', 'home_hero')
+                ->where('status', true)
+                ->orderBy('sort_order')
+                ->first(),
+            'promoBanners' => Banner::where('position', 'home_promo')
+                ->where('status', true)
+                ->orderBy('sort_order')
+                ->take(3)
                 ->get(),
         ]);
     }

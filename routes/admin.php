@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EnquiryController;
+use App\Http\Controllers\Admin\ImportController;
 use App\Http\Controllers\Admin\PageController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\QuoteController;
@@ -21,9 +22,8 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 | Admin Routes
 |--------------------------------------------------------------------------
-| Full replacement for the Phase 6 admin.php — adds Solutions, Blog,
-| Pages, Banners, Settings (Phase 7). Everything from Phase 2/3/5/6 is
-| unchanged.
+| Full replacement for the Phase 7 admin.php — adds CSV Import (Phase 8).
+| Everything from earlier phases is unchanged.
 */
 
 Route::prefix('admin')->name('admin.')->group(function () {
@@ -61,6 +61,13 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::delete('products/{product}/images/{image}', [ProductController::class, 'deleteImage'])->name('products.images.destroy');
         Route::post('products/{product}/images/{image}/primary', [ProductController::class, 'setPrimaryImage'])->name('products.images.primary');
 
+        Route::get('imports', [ImportController::class, 'index'])->name('imports.index');
+        Route::get('imports/create', [ImportController::class, 'create'])->name('imports.create');
+        Route::post('imports/preview', [ImportController::class, 'preview'])->name('imports.preview');
+        Route::post('imports', [ImportController::class, 'store'])->name('imports.store');
+        Route::get('imports/{import}', [ImportController::class, 'show'])->name('imports.show');
+        Route::get('imports/{import}/errors', [ImportController::class, 'downloadErrors'])->name('imports.errors');
+
         Route::get('enquiries', [EnquiryController::class, 'index'])->name('enquiries.index');
         Route::get('enquiries/{enquiry}', [EnquiryController::class, 'show'])->name('enquiries.show');
         Route::put('enquiries/{enquiry}/status', [EnquiryController::class, 'updateStatus'])->name('enquiries.status');
@@ -85,6 +92,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('settings', [SettingController::class, 'edit'])->name('settings.edit');
         Route::put('settings', [SettingController::class, 'update'])->name('settings.update');
 
-        // Phase 8+ will add: customers list, CSV import, users management.
+        // Still open: customers list, users management, 2FA.
     });
 });

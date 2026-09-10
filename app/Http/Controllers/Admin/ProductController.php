@@ -164,7 +164,11 @@ class ProductController extends Controller
     {
         $filename = 'products-'.now()->format('Y-m-d-His').'.csv';
 
-        $columns = ['id', 'name', 'sku', 'model_number', 'brand', 'category', 'price', 'price_type', 'stock', 'status', 'image'];
+        $columns = [
+            'id', 'name', 'sku', 'model_number', 'brand', 'category',
+            'short_description', 'description',
+            'price', 'price_type', 'stock', 'status', 'image',
+        ];
 
         return response()->streamDownload(function () use ($columns) {
             $handle = fopen('php://output', 'w');
@@ -186,6 +190,8 @@ class ProductController extends Controller
                         $product->model_number,
                         $product->brand?->name,
                         $product->category?->name,
+                        $product->short_description,
+                        $product->description,
                         $product->price,
                         $product->price_type,
                         $product->stock,

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', \App\Models\Setting::get('seo_title', config('app.name')))</title>
-<meta name="description" content="@yield('meta_description', \App\Models\Setting::get('seo_description', 'Enterprise IT products and solutions for businesses across the UAE.'))">
+    <meta name="description" content="@yield('meta_description', \App\Models\Setting::get('seo_description', 'Enterprise IT products and solutions for businesses across the UAE.'))">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -25,7 +25,9 @@
 
 <header class="border-bottom bg-white sticky-top">
     <nav class="navbar navbar-expand-lg container py-3">
-        <a class="navbar-brand fw-bold fs-4" href="{{ route('home') }}">{{ config('app.name') }}</a>
+        <a class="navbar-brand fw-bold fs-4" href="{{ route('home') }}">
+            {{ \App\Models\Setting::get('company_name', config('app.name')) }}
+        </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -48,8 +50,8 @@
                         @endforeach
                     </ul>
                 </li>
-                <li class="nav-item"><a class="nav-link" href="#">Solutions</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">About</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ route('solutions.index') }}">Solutions</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ route('blog.index') }}">Blog</a></li>
                 <li class="nav-item"><a class="nav-link" href="{{ route('contact.create') }}">Contact</a></li>
             </ul>
             <a href="{{ route('enquiry.index') }}" class="btn btn-outline-secondary position-relative me-3">
@@ -82,17 +84,27 @@
                 <h6 class="text-white">Quick Links</h6>
                 <ul class="list-unstyled small">
                     <li><a href="{{ route('products.index') }}" class="text-white-50 text-decoration-none">Products</a></li>
-                    <li><a href="#" class="text-white-50 text-decoration-none">About Us</a></li>
+                    <li><a href="{{ route('solutions.index') }}" class="text-white-50 text-decoration-none">Solutions</a></li>
+                    <li><a href="{{ route('blog.index') }}" class="text-white-50 text-decoration-none">Blog</a></li>
                     <li><a href="{{ route('contact.create') }}" class="text-white-50 text-decoration-none">Contact</a></li>
+                    @foreach(\App\Models\Page::where('status', true)->orderBy('title')->get() as $footerPage)
+                        <li><a href="{{ route('pages.show', $footerPage) }}" class="text-white-50 text-decoration-none">{{ $footerPage->title }}</a></li>
+                    @endforeach
                 </ul>
             </div>
             <div class="col-md-4 mb-3">
                 <h6 class="text-white">Get in Touch</h6>
                 <p class="small mb-0">{{ \App\Models\Setting::get('address', 'UAE | Dubai') }}</p>
+                @if(\App\Models\Setting::get('email'))
+                    <p class="small mb-0">{{ \App\Models\Setting::get('email') }}</p>
+                @endif
+                @if(\App\Models\Setting::get('phone'))
+                    <p class="small mb-0">{{ \App\Models\Setting::get('phone') }}</p>
+                @endif
             </div>
         </div>
         <hr class="border-secondary">
-        <p class="small mb-0 text-center">&copy; {{ date('Y') }} {{ config('app.name') }}. All rights reserved.</p>
+        <p class="small mb-0 text-center">&copy; {{ date('Y') }} {{ \App\Models\Setting::get('company_name', config('app.name')) }}. All rights reserved.</p>
     </div>
 </footer>
 
