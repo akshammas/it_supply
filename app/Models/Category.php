@@ -7,11 +7,15 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\Concerns\LogsActivity;
+use App\Models\Concerns\BustsFrontendCache;
 
 class Category extends Model
 {
     use HasFactory;
     use LogsActivity;
+    use BustsFrontendCache;
+
+    protected array $frontendCacheKeys = ['nav.categories', 'homepage.data', 'sitemap.xml'];
 
     protected $fillable = [
         'parent_id', 'name', 'slug', 'description', 'image',

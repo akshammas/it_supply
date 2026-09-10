@@ -20,6 +20,9 @@ class Blog extends Model
         'published_at' => 'datetime',
     ];
 
+
+    protected array $frontendCacheKeys = ['sitemap.xml'];
+
     public function category(): BelongsTo
     {
         return $this->belongsTo(BlogCategory::class, 'blog_category_id');

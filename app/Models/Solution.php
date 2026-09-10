@@ -19,6 +19,9 @@ class Solution extends Model
         'status' => 'boolean',
     ];
 
+    
+    protected array $frontendCacheKeys = ['homepage.data', 'sitemap.xml'];
+
     public function products(): BelongsToMany
     {
         return $this->belongsToMany(Product::class, 'solution_product')->withPivot('sort_order');

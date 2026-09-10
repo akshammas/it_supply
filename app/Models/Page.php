@@ -16,4 +16,7 @@ class Page extends Model
     protected $casts = [
         'status' => 'boolean',
     ];
+
+    
+    protected array $frontendCacheKeys = ['sitemap.xml'];
 }

@@ -25,4 +25,7 @@ class Brand extends Model
     {
         return $this->hasMany(Product::class);
     }
+    
+    
+    protected array $frontendCacheKeys = ['nav.brands', 'homepage.data', 'sitemap.xml'];
 }

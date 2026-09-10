@@ -29,6 +29,8 @@ class Product extends Model
         'status' => 'boolean',
     ];
 
+    protected array $frontendCacheKeys = ['homepage.data', 'sitemap.xml'];
+
     public function brand(): BelongsTo
     {
         return $this->belongsTo(Brand::class);

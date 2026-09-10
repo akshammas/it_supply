@@ -10,6 +10,7 @@ use App\Http\Controllers\Frontend\PageController;
 use App\Http\Controllers\Frontend\ProductController;
 use App\Http\Controllers\Frontend\QuoteRequestController;
 use App\Http\Controllers\Frontend\SearchController;
+use App\Http\Controllers\Frontend\SitemapController;
 use App\Http\Controllers\Frontend\SolutionController;
 use Illuminate\Support\Facades\Route;
 
@@ -17,11 +18,12 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 | Public Frontend Routes
 |--------------------------------------------------------------------------
-| Full replacement for the Phase 5 web.php — adds Solutions, Blog, Pages
-| (Phase 7). IMPORTANT: the {page:slug} catch-all at the very bottom of
-| this file MUST stay last, after admin.php is required — otherwise a
-| visit to /admin would get swallowed as if "admin" were a page slug.
-| Never insert new routes below that line without moving it back down.
+| Full replacement for the Phase 7b web.php — adds sitemap.xml and
+| robots.txt (Phase 9). IMPORTANT: the {page:slug} catch-all at the very
+| bottom of this file MUST stay last. sitemap.xml and robots.txt are
+| registered ABOVE it for the same reason /admin needs to be — both are
+| single-segment paths the catch-all would otherwise try to match as a
+| Page slug first.
 */
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -52,10 +54,21 @@ Route::get('/solutions/{solution:slug}', [SolutionController::class, 'show'])->n
 Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
 Route::get('/blog/{post:slug}', [BlogController::class, 'show'])->name('blog.show');
 
+Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
+Route::get('/robots.txt', function () {
+    $lines = [
+        'User-agent: *',
+        'Allow: /',
+        'Disallow: /admin',
+        'Disallow: /enquiry',
+        'Disallow: /request-quote',
+        'Sitemap: '.route('sitemap'),
+    ];
+
+    return response(implode("\n", $lines), 200)->header('Content-Type', 'text/plain');
+})->name('robots');
+
 require __DIR__.'/admin.php';
 
-// CATCH-ALL — must stay last. Matches any remaining single-segment URL
-// (e.g. /about-us, /privacy-policy, /warranty) against a published Page.
-// If no Page with that slug exists, Laravel's route model binding 404s
-// naturally — nothing above this line is at risk of being swallowed by it.
+// CATCH-ALL — must stay last. See note at top of file.
 Route::get('/{page:slug}', [PageController::class, 'show'])->name('pages.show');

@@ -16,4 +16,7 @@ class Banner extends Model
     protected $casts = [
         'status' => 'boolean',
     ];
+
+
+    protected array $frontendCacheKeys = ['homepage.data'];
 }

@@ -5,6 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', \App\Models\Setting::get('seo_title', config('app.name')))</title>
     <meta name="description" content="@yield('meta_description', \App\Models\Setting::get('seo_description', 'Enterprise IT products and solutions for businesses across the UAE.'))">
+    <link rel="canonical" href="{{ url()->current() }}">
+
+    {{-- Open Graph / social sharing (section 38) --}}
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="@yield('title', \App\Models\Setting::get('seo_title', config('app.name')))">
+    <meta property="og:description" content="@yield('meta_description', \App\Models\Setting::get('seo_description', ''))">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:image" content="@yield('og_image', \App\Models\Setting::get('logo') ? Storage::url(\App\Models\Setting::get('logo')) : '')">
+    <meta name="twitter:card" content="summary_large_image">
+
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -37,7 +47,8 @@
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Brands</a>
                     <ul class="dropdown-menu">
-                        @foreach(\App\Models\Brand::where('status', true)->orderBy('name')->take(12)->get() as $navBrand)
+                        {{-- Section 56: nav queries run on EVERY page — cache them --}}
+                        @foreach(\Illuminate\Support\Facades\Cache::remember('nav.brands', now()->addHour(), fn() => \App\Models\Brand::where('status', true)->orderBy('name')->take(12)->get()) as $navBrand)
                             <li><a class="dropdown-item" href="{{ route('brands.show', $navBrand) }}">{{ $navBrand->name }}</a></li>
                         @endforeach
                     </ul>
@@ -45,7 +56,7 @@
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Categories</a>
                     <ul class="dropdown-menu">
-                        @foreach(\App\Models\Category::whereNull('parent_id')->where('status', true)->orderBy('sort_order')->get() as $navCategory)
+                        @foreach(\Illuminate\Support\Facades\Cache::remember('nav.categories', now()->addHour(), fn() => \App\Models\Category::whereNull('parent_id')->where('status', true)->orderBy('sort_order')->get()) as $navCategory)
                             <li><a class="dropdown-item" href="{{ route('categories.show', $navCategory) }}">{{ $navCategory->name }}</a></li>
                         @endforeach
                     </ul>
