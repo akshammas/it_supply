@@ -38,10 +38,6 @@ class ProductImportService
     {
     }
 
-    /**
-     * Stores the uploaded CSV, reads its header row + a few sample rows
-     * for the column-mapping screen. Doesn't touch the database yet.
-     */
     public function handleUpload(\Illuminate\Http\UploadedFile $file): array
     {
         $path = $file->store('imports', 'local');
@@ -72,7 +68,7 @@ class ProductImportService
     {
         $fullPath = Storage::disk('local')->path($path);
         $handle = fopen($fullPath, 'r');
-        fgetcsv($handle); // skip header
+        fgetcsv($handle);
 
         $count = 0;
         while (fgetcsv($handle) !== false) {
@@ -84,15 +80,11 @@ class ProductImportService
         return $count;
     }
 
-    /**
-     * Reads rows [offset, offset+limit) — NOT counting the header row —
-     * as associative arrays keyed by the mapped system field names.
-     */
     public function readChunk(string $path, array $headers, array $mapping, int $offset, int $limit): array
     {
         $fullPath = Storage::disk('local')->path($path);
         $handle = fopen($fullPath, 'r');
-        fgetcsv($handle); // skip header
+        fgetcsv($handle);
 
         for ($i = 0; $i < $offset; $i++) {
             if (fgetcsv($handle) === false) {
@@ -126,14 +118,6 @@ class ProductImportService
         return $rows;
     }
 
-    /**
-     * CSVs exported from Shopify/Excel are frequently saved as
-     * Windows-1252, not UTF-8 — smart quotes, en-dashes, and inch marks
-     * (’ – " " etc.) are the usual culprits. Reading them as raw UTF-8
-     * produces invalid byte sequences that later crash json_encode()
-     * when Eloquent tries to save the import's error log. Detect and
-     * convert rather than silently stripping the characters.
-     */
     protected function toUtf8(?string $value): ?string
     {
         if ($value === null || $value === '') {
@@ -150,38 +134,61 @@ class ProductImportService
             return $converted;
         }
 
-        // Last-resort fallback: strip anything that still isn't valid
-        // UTF-8 rather than letting one bad byte crash the whole import.
         return mb_convert_encoding($value, 'UTF-8', 'UTF-8');
     }
 
     /**
-     * Processes one row. Returns ['result' => 'imported'|'updated', ...]
-     * on success, or throws with a human-readable message on failure —
-     * the caller (the queued job) catches it and records the row number
-     * + message into the import's error log.
+     * Processes one row. Returns:
+     *   ['result' => 'imported'|'updated', 'warnings' => string[]]
+     * on success (the row's core data was valid — warnings list any
+     * individual image URLs that failed but didn't block the product
+     * itself), or throws for a genuine row failure (missing name,
+     * invalid price).
+     *
+     * Brand/Category are auto-created when they don't already exist,
+     * rather than failing the row — see the note above processRow's
+     * brand/category lookups.
+     *
+     * Image failures are DELIBERATELY non-fatal to the row: a CSV with
+     * 10 image URLs per product where 1 is broken should still import
+     * the product with its other 9 images, not fail the whole row.
      */
-    public function processRow(array $row): string
+    public function processRow(array $row): array
     {
         if (empty($row['name'])) {
             throw new \RuntimeException('Missing product name');
         }
 
+        // Brand/category are auto-created if they don't already exist,
+        // matched case-insensitively so "Dell" and "dell" in different
+        // rows resolve to the same record rather than creating duplicates.
         $brandId = null;
         if (! empty($row['brand'])) {
             $brand = Brand::whereRaw('LOWER(name) = ?', [Str::lower($row['brand'])])->first();
+
             if (! $brand) {
-                throw new \RuntimeException("Invalid brand: {$row['brand']}");
+                $brand = Brand::create([
+                    'name' => $row['brand'],
+                    'slug' => $this->uniqueSlug(Brand::class, $row['brand']),
+                    'status' => true,
+                ]);
             }
+
             $brandId = $brand->id;
         }
 
         $categoryId = null;
         if (! empty($row['category'])) {
             $category = Category::whereRaw('LOWER(name) = ?', [Str::lower($row['category'])])->first();
+
             if (! $category) {
-                throw new \RuntimeException("Invalid category: {$row['category']}");
+                $category = Category::create([
+                    'name' => $row['category'],
+                    'slug' => $this->uniqueSlug(Category::class, $row['category']),
+                    'status' => true,
+                ]);
             }
+
             $categoryId = $category->id;
         }
 
@@ -189,16 +196,18 @@ class ProductImportService
             throw new \RuntimeException("Invalid price: {$row['price']}");
         }
 
-        // Download+validate images BEFORE touching the database, so a bad
-        // image URL fails the row cleanly without leaving a half-created
-        // product behind.
+        // Each image URL is independent — one bad link among many doesn't
+        // sink the whole row. Failures are collected as warnings, not
+        // thrown, so the product still saves with whatever DID download.
         $downloadedImages = [];
+        $warnings = [];
+
         if (! empty($row['images'])) {
             foreach (array_filter(array_map('trim', explode(',', $row['images']))) as $url) {
                 try {
                     $downloadedImages[] = $this->images->downloadFromUrl($url, 'products/import');
                 } catch (Throwable $e) {
-                    throw new \RuntimeException("Invalid image URL: {$url}");
+                    $warnings[] = "Image skipped ({$url}): {$e->getMessage()}";
                 }
             }
         }
@@ -221,7 +230,6 @@ class ProductImportService
         ], fn ($v) => $v !== null && $v !== '');
 
         if ($existing) {
-            // Don't overwrite the slug of an existing product on update.
             unset($data['slug']);
             $existing->update($data);
             $product = $existing;
@@ -234,17 +242,38 @@ class ProductImportService
             $result = 'imported';
         }
 
+        $existingImageCount = $product->images()->count();
+
         foreach ($downloadedImages as $index => $image) {
             ProductImage::create([
                 'product_id' => $product->id,
                 'image' => $image['path'],
                 'alt_text' => $product->name,
-                'sort_order' => $index,
-                'is_primary' => $index === 0 && $product->images()->count() === 0,
+                'sort_order' => $existingImageCount + $index,
+                'is_primary' => $existingImageCount === 0 && $index === 0,
             ]);
         }
 
-        return $result;
+        return ['result' => $result, 'warnings' => $warnings];
+    }
+
+    /**
+     * Generates a unique slug for an auto-created Brand/Category, so two
+     * different rows with names that slugify to the same thing (e.g.
+     * "HP" and "H.P.") don't collide on the unique slug constraint.
+     */
+    protected function uniqueSlug(string $modelClass, string $name): string
+    {
+        $base = Str::slug($name);
+        $slug = $base;
+        $i = 1;
+
+        while ($modelClass::where('slug', $slug)->exists()) {
+            $slug = "{$base}-{$i}";
+            $i++;
+        }
+
+        return $slug;
     }
 
     public function writeErrorCsv(ProductImport $import): string

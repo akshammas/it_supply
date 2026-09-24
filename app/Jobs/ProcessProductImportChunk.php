@@ -17,6 +17,17 @@ use Throwable;
  * instance handles one chunk (100 rows), then dispatches the next chunk
  * — never the whole file in one PHP process. On Hostinger, this relies
  * on the database queue being drained by cron (see PHASE8_NOTES.md).
+ *
+ * NOTE ON QUEUE_CONNECTION=sync (local dev default): with sync, jobs
+ * execute immediately and inline, including the self-dispatch of the
+ * NEXT chunk — meaning a large import with many image downloads can
+ * still run past PHP's max_execution_time, because the whole chain
+ * happens inside one HTTP request no matter how it's chunked. The
+ * set_time_limit(0) below removes that cap for this job specifically.
+ * For imports of any real size, switch QUEUE_CONNECTION=database and
+ * run `php artisan queue:work` in a second terminal instead — each
+ * chunk then runs as its own process with its own time budget, which is
+ * both faster to see progress on and how production actually works.
  */
 class ProcessProductImportChunk implements ShouldQueue
 {
@@ -33,6 +44,13 @@ class ProcessProductImportChunk implements ShouldQueue
 
     public function handle(ProductImportService $service): void
     {
+        // Only relevant under QUEUE_CONNECTION=sync — a real queue worker
+        // already runs each job as its own process, so this is a no-op
+        // there. Harmless either way.
+        if (function_exists('set_time_limit')) {
+            @set_time_limit(0);
+        }
+
         $import = ProductImport::find($this->importId);
 
         if (! $import) {
@@ -53,23 +71,22 @@ class ProcessProductImportChunk implements ShouldQueue
         $failed = $import->failed_count;
 
         foreach ($rows as $i => $row) {
-            $rowNumber = $this->offset + $i + 2; // +2: 1-indexed + header row
+            $rowNumber = $this->offset + $i + 2;
 
             try {
-                $result = $service->processRow($row);
+                $outcome = $service->processRow($row);
 
-                if ($result === 'imported') {
+                if ($outcome['result'] === 'imported') {
                     $imported++;
                 } else {
                     $updated++;
                 }
+
+                foreach ($outcome['warnings'] as $warning) {
+                    $errors[] = ['row' => $rowNumber, 'message' => $this->sanitizeMessage($warning)];
+                }
             } catch (Throwable $e) {
                 $failed++;
-                // Defensive second layer: even though readChunk() already
-                // sanitizes every CSV value to valid UTF-8, guard the
-                // error message itself too, since it's the thing that
-                // gets json_encode()'d when the import row is saved —
-                // one bad byte anywhere in this array fails the whole save.
                 $errors[] = ['row' => $rowNumber, 'message' => $this->sanitizeMessage($e->getMessage())];
             }
         }
@@ -85,8 +102,6 @@ class ProcessProductImportChunk implements ShouldQueue
         ]);
 
         if (count($rows) < $this->chunkSize || $processed >= $import->total_rows) {
-            // No more rows — finalize, and write the downloadable error
-            // CSV if anything failed (section 27).
             $import->update(['status' => 'completed']);
 
             if (! empty($errors)) {

@@ -3,19 +3,45 @@
 
 @section('content')
 
-    {{-- HERO — uses a home_hero Banner's image as background if one exists,
-         otherwise falls back to a plain dark background. Title/subtitle
-         always come from Settings (editable without a banner). --}}
-    <section class="text-white py-5 {{ $heroBanner ? '' : 'bg-dark' }}"
-        @if($heroBanner) style="background: #111 url('{{ Storage::url($heroBanner->image) }}') center/cover;" @endif>
-        <div class="container text-center py-4">
-            <h1 class="display-5 fw-bold">{{ \App\Models\Setting::get('hero_title', 'Enterprise IT Products & Solutions') }}</h1>
-            <p class="lead text-white-50">{{ \App\Models\Setting::get('hero_subtitle', 'For Businesses Across UAE') }}</p>
-            <p class="mb-4">Servers &middot; Networking &middot; Security &middot; POS &middot; Access Control</p>
-            <a href="{{ route('products.index') }}" class="btn btn-light btn-lg me-2">Explore Products</a>
-            <a href="{{ route('products.index') }}" class="btn btn-outline-light btn-lg">Request a Quote</a>
+    {{-- HERO --}}
+    @if($heroBanners->isNotEmpty())
+        <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
+            @if($heroBanners->count() > 1)
+                <div class="carousel-indicators">
+                    @foreach($heroBanners as $banner)
+                        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="{{ $loop->index }}" class="{{ $loop->first ? 'active' : '' }}"></button>
+                    @endforeach
+                </div>
+            @endif
+            <div class="carousel-inner">
+                @foreach($heroBanners as $banner)
+                    <div class="carousel-item {{ $loop->first ? 'active' : '' }}">
+                        <div class="text-white d-flex align-items-center" style="height:420px; background:#111 url('{{ Storage::url($banner->image) }}') center/cover;">
+                            <div class="container text-center py-4">
+                                <h1 class="display-5 fw-bold">{{ $banner->title ?: \App\Models\Setting::get('hero_title', 'Enterprise IT Products & Solutions') }}</h1>
+                                <p class="lead text-white-50">{{ $banner->subtitle ?: \App\Models\Setting::get('hero_subtitle', 'For Businesses Across UAE') }}</p>
+                                <a href="{{ route('products.index') }}" class="btn btn-brand btn-lg me-2">Explore Products</a>
+                                <a href="{{ $banner->link_url ?: route('quote-request.create') }}" class="btn btn-outline-light btn-lg">{{ $banner->button_text ?: 'Request a Quote' }}</a>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+            @if($heroBanners->count() > 1)
+                <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev"><span class="carousel-control-prev-icon"></span></button>
+                <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next"><span class="carousel-control-next-icon"></span></button>
+            @endif
         </div>
-    </section>
+    @else
+        <section style="background:var(--ink);" class="text-white py-5">
+            <div class="container text-center py-4">
+                <h1 class="display-5 fw-bold">{{ \App\Models\Setting::get('hero_title', 'Enterprise IT Products & Solutions') }}</h1>
+                <p class="lead text-white-50">{{ \App\Models\Setting::get('hero_subtitle', 'For Businesses Across UAE') }}</p>
+                <a href="{{ route('products.index') }}" class="btn btn-brand btn-lg me-2">Explore Products</a>
+                <a href="{{ route('quote-request.create') }}" class="btn btn-outline-light btn-lg">Request a Quote</a>
+            </div>
+        </section>
+    @endif
 
     {{-- PROMO BANNERS --}}
     @if($promoBanners->isNotEmpty())
@@ -24,11 +50,10 @@
             @foreach($promoBanners as $banner)
                 <div class="col-md-{{ 12 / min($promoBanners->count(), 3) }} mb-3">
                     <a href="{{ $banner->link_url ?: '#' }}" class="d-block position-relative text-decoration-none">
-                        <img src="{{ Storage::url($banner->image) }}" class="img-fluid rounded w-100" style="height:160px; object-fit:cover;">
+                        <img src="{{ Storage::url($banner->image) }}" class="img-fluid rounded w-100" style="height:150px; object-fit:cover;">
                         @if($banner->title)
-                            <div class="position-absolute bottom-0 start-0 p-3 text-white" style="background:linear-gradient(transparent, rgba(0,0,0,.6)); width:100%;">
+                            <div class="position-absolute bottom-0 start-0 p-3 text-white" style="background:linear-gradient(transparent, rgba(0,0,0,.65)); width:100%;">
                                 <div class="fw-semibold">{{ $banner->title }}</div>
-                                @if($banner->button_text)<span class="small">{{ $banner->button_text }} &rarr;</span>@endif
                             </div>
                         @endif
                     </a>
@@ -38,48 +63,21 @@
     </section>
     @endif
 
-    {{-- BRANDS — now first, using the card-grid design (image, name, shadow) --}}
+    {{-- TOP BRANDS — grid, max 5 per row --}}
     @if($featuredBrands->isNotEmpty())
-    <section class="container py-5">
-        <h3 class="mb-4">Featured Brands</h3>
-        <div class="row">
-            @foreach($featuredBrands as $brand)
-                <div class="col-6 col-md-3 mb-4">
-                    <a href="{{ route('brands.show', $brand) }}" class="text-decoration-none">
-                        <div class="card h-100 text-center shadow-sm">
-                            @if($brand->logo)
-                                <img src="{{ Storage::url($brand->logo) }}" class="card-img-top p-3" style="height:120px; object-fit:contain;" alt="{{ $brand->name }}">
-                            @else
-                                <div class="bg-light d-flex align-items-center justify-content-center" style="height:120px;">
-                                    <i class="bi bi-award fs-2 text-muted"></i>
-                                </div>
-                            @endif
-                            <div class="card-body py-2">
-                                <div class="text-dark small fw-semibold">{{ $brand->name }}</div>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-            @endforeach
-        </div>
-    </section>
-    @endif
-
-    {{-- CATEGORIES — now second, using the simple logo-strip design --}}
-    @if($featuredCategories->isNotEmpty())
-    <section class="bg-light py-5">
+    <section class="py-5" style="background:var(--brand-red-light);">
         <div class="container">
-            <h3 class="mb-4">Shop by Category</h3>
-            <div class="row align-items-center">
-                @foreach($featuredCategories as $category)
-                    <div class="col-4 col-md-2 mb-4 text-center">
-                        <a href="{{ route('categories.show', $category) }}" class="text-decoration-none">
-                            @if($category->image)
-                                <img src="{{ Storage::url($category->image) }}" class="img-fluid" style="max-height:50px;" alt="{{ $category->name }}">
+            <div class="section-eyebrow">Partners</div>
+            <h2 class="section-title mb-4">Top Brands</h2>
+            <div class="row row-cols-2 row-cols-sm-3 row-cols-md-5 g-3">
+                @foreach($featuredBrands as $brand)
+                    <div class="col">
+                        <a href="{{ route('brands.show', $brand) }}" class="brand-tile bg-white w-100" style="height:90px;">
+                            @if($brand->logo)
+                                <img src="{{ Storage::url($brand->logo) }}" alt="{{ $brand->name }}">
                             @else
-                                <i class="bi bi-box2 fs-3 text-muted d-block mb-1"></i>
+                                <span class="fw-semibold small text-center">{{ $brand->name }}</span>
                             @endif
-                            <div class="small fw-semibold text-dark mt-2">{{ $category->name }}</div>
                         </a>
                     </div>
                 @endforeach
@@ -88,10 +86,35 @@
     </section>
     @endif
 
+    {{-- BROWSE CATEGORIES — grid, max 5 per row --}}
+    @if($featuredCategories->isNotEmpty())
+    <section class="container py-5">
+        <div class="section-eyebrow">Browse</div>
+        <h2 class="section-title mb-4">Shop by Category</h2>
+        <div class="row row-cols-3 row-cols-sm-4 row-cols-md-5 g-3">
+            @foreach($featuredCategories as $category)
+                <div class="col">
+                    <a href="{{ route('categories.show', $category) }}" class="category-chip">
+                        <div class="chip-icon">
+                            @if($category->image)
+                                <img src="{{ Storage::url($category->image) }}" style="width:32px; height:32px; object-fit:contain;">
+                            @else
+                                <i class="bi bi-box2 fs-5 text-danger"></i>
+                            @endif
+                        </div>
+                        <div class="chip-label">{{ $category->name }}</div>
+                    </a>
+                </div>
+            @endforeach
+        </div>
+    </section>
+    @endif
+
     {{-- FEATURED PRODUCTS --}}
     @if($featuredProducts->isNotEmpty())
     <section class="container py-5">
-        <h3 class="mb-4">Featured Products</h3>
+        <div class="section-eyebrow">Top Picks</div>
+        <h2 class="section-title mb-4">Featured Products</h2>
         <div class="row">
             @foreach($featuredProducts as $product)
                 @include('frontend.partials.product-card', ['product' => $product])
@@ -102,17 +125,20 @@
 
     {{-- SOLUTIONS --}}
     @if($solutions->isNotEmpty())
-    <section class="bg-light py-5">
+    <section class="py-5" style="background:#FAFAFA;">
         <div class="container">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h3 class="mb-0">Solutions</h3>
-                <a href="{{ route('solutions.index') }}" class="small">View all &rarr;</a>
+            <div class="d-flex justify-content-between align-items-end mb-4">
+                <div>
+                    <div class="section-eyebrow">Our Expertise</div>
+                    <h2 class="section-title mb-0">Solutions</h2>
+                </div>
+                <a href="{{ route('solutions.index') }}" class="fw-semibold text-decoration-none" style="color:var(--brand-red);">View all &rarr;</a>
             </div>
             <div class="row">
                 @foreach($solutions as $solution)
                     <div class="col-md-4 mb-4">
-                        <a href="{{ route('solutions.show', $solution) }}" class="text-decoration-none text-dark">
-                            <div class="card h-100 shadow-sm">
+                        <a href="{{ route('solutions.show', $solution) }}" class="text-decoration-none" style="color:var(--ink);">
+                            <div class="card h-100 border-0 shadow-sm">
                                 @if($solution->image)
                                     <img src="{{ Storage::url($solution->image) }}" class="card-img-top" style="height:160px; object-fit:cover;">
                                 @endif
@@ -129,7 +155,7 @@
     </section>
     @endif
 
-    {{-- WHY CHOOSE US --}}
+    {{-- TRUST BADGES --}}
     <section class="container py-5">
         <div class="row text-center g-4">
             @foreach([
@@ -140,18 +166,18 @@
                 ['icon' => 'bi-shield-check', 'label' => 'Warranty Support'],
             ] as $item)
                 <div class="col-6 col-md-2 col-lg-2 mx-auto">
-                    <i class="bi {{ $item['icon'] }} fs-1 text-primary"></i>
-                    <p class="small mt-2 mb-0">{{ $item['label'] }}</p>
+                    <i class="bi {{ $item['icon'] }} fs-1" style="color:var(--brand-red);"></i>
+                    <p class="small mt-2 mb-0 fw-semibold">{{ $item['label'] }}</p>
                 </div>
             @endforeach
         </div>
     </section>
 
-    {{-- CTA --}}
-    <section class="bg-dark text-white text-center py-5">
+    {{-- CTA BAND --}}
+    <section class="cta-band text-center py-5">
         <div class="container">
-            <h4 class="mb-3">Looking for a specific IT product?</h4>
-            <a href="{{ route('products.index') }}" class="btn btn-light btn-lg">Request a Quote</a>
+            <h4 class="mb-3 fw-bold">Looking for a specific IT product?</h4>
+            <a href="{{ route('quote-request.create') }}" class="btn btn-light btn-lg fw-semibold">Request a Quote</a>
         </div>
     </section>
 

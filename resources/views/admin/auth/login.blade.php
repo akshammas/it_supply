@@ -14,6 +14,10 @@
                 <div class="card-body p-4">
                     <h4 class="text-center mb-4">{{ config('app.name') }} Admin</h4>
 
+                    @if(session('status'))
+                        <div class="alert alert-info">{{ session('status') }}</div>
+                    @endif
+
                     @if ($errors->any())
                         <div class="alert alert-danger">
                             {{ $errors->first() }}

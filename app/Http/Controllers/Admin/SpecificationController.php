@@ -17,6 +17,8 @@ class SpecificationController extends Controller
             'sort_order' => ['nullable', 'integer', 'min:0'],
         ]);
 
+        $data['sort_order'] ??= 0;
+
         Specification::create($data);
 
         return back()->with('status', 'Specification added.');
@@ -28,6 +30,8 @@ class SpecificationController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'sort_order' => ['nullable', 'integer', 'min:0'],
         ]);
+
+        $data['sort_order'] ??= 0;
 
         $specification->update($data);
 

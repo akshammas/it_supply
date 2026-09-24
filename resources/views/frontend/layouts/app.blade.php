@@ -7,7 +7,6 @@
     <meta name="description" content="@yield('meta_description', \App\Models\Setting::get('seo_description', 'Enterprise IT products and solutions for businesses across the UAE.'))">
     <link rel="canonical" href="{{ url()->current() }}">
 
-    {{-- Open Graph / social sharing (section 38) --}}
     <meta property="og:type" content="website">
     <meta property="og:title" content="@yield('title', \App\Models\Setting::get('seo_title', config('app.name')))">
     <meta property="og:description" content="@yield('meta_description', \App\Models\Setting::get('seo_description', ''))">
@@ -17,8 +16,76 @@
 
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+
     <style>
+        :root {
+            --brand-red: #E4002B;
+            --brand-red-dark: #B5001F;
+            --brand-red-light: #FFF1F3;
+            --ink: #1A1A1A;
+            --muted: #6B7280;
+        }
+        body { font-family: 'Inter', sans-serif; color: var(--ink); }
+
+        /* ---- Header ---- */
+        .site-header { border-bottom: 1px solid #eee; }
+        .brand-logo { font-weight: 800; font-size: 1.4rem; color: var(--ink); letter-spacing: -.02em; }
+        .brand-logo span { color: var(--brand-red); }
+        .main-nav .nav-link { font-weight: 600; color: var(--ink); padding: .5rem 1rem; }
+        .main-nav .nav-link:hover, .main-nav .nav-link.show { color: var(--brand-red); }
+        .btn-brand { background: var(--brand-red); border-color: var(--brand-red); color: #fff; font-weight: 600; }
+        .btn-brand:hover { background: var(--brand-red-dark); border-color: var(--brand-red-dark); color: #fff; }
+        .btn-outline-brand { border: 1.5px solid var(--brand-red); color: var(--brand-red); font-weight: 600; }
+        .btn-outline-brand:hover { background: var(--brand-red); color: #fff; }
+        .quote-badge { background: var(--brand-red); }
+
+        /* ---- Mega menu ---- */
+        .mega-menu {
+            position: absolute; left: 0; right: 0; top: 100%;
+            background: #fff; border-top: 3px solid var(--brand-red);
+            box-shadow: 0 12px 24px rgba(0,0,0,.08);
+            padding: 1.75rem 0; display: none; z-index: 1030;
+        }
+        .mega-menu.show { display: block; }
+        .mega-col-title { font-weight: 700; font-size: .95rem; color: var(--ink); margin-bottom: .6rem; display: flex; align-items: center; gap: .5rem; }
+        .mega-col-title img { width: 22px; height: 22px; object-fit: contain; }
+        .mega-col a { display: block; font-size: .85rem; color: var(--muted); text-decoration: none; padding: .2rem 0; }
+        .mega-col a:hover { color: var(--brand-red); }
+
+        /* ---- Category strip ---- */
+        .category-chip { text-decoration: none; text-align: center; display: block; }
+        .category-chip .chip-icon {
+            width: 64px; height: 64px; border-radius: 50%; background: var(--brand-red-light);
+            display: flex; align-items: center; justify-content: center; margin: 0 auto .5rem;
+            border: 1px solid #ffe0e5; transition: .15s;
+        }
+        .category-chip:hover .chip-icon { background: var(--brand-red); }
+        .category-chip:hover .chip-icon i, .category-chip:hover .chip-icon img { filter: brightness(0) invert(1); }
+        .category-chip .chip-label { font-size: .8rem; font-weight: 600; color: var(--ink); }
+        .scroll-row { display: flex; gap: 1.25rem; overflow-x: auto; padding-bottom: .5rem; scrollbar-width: thin; }
+        .scroll-row::-webkit-scrollbar { height: 6px; }
+        .scroll-row::-webkit-scrollbar-thumb { background: #ddd; border-radius: 3px; }
+        .scroll-row > * { flex: 0 0 auto; }
+
+        /* ---- Brand strip ---- */
+        .brand-tile {
+            width: 130px; height: 80px; border: 1px solid #eee; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center; padding: .75rem;
+            transition: .15s;
+        }
+        .brand-tile:hover { border-color: var(--brand-red); box-shadow: 0 4px 12px rgba(228,0,43,.1); }
+        .brand-tile img { max-height: 40px; max-width: 100%; object-fit: contain; }
+
+        /* ---- Section headers ---- */
+        .section-eyebrow { color: var(--brand-red); font-weight: 700; font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; }
+        .section-title { font-weight: 800; font-size: 1.6rem; }
+
+        /* ---- CTA band ---- */
+        .cta-band { background: linear-gradient(120deg, var(--brand-red), var(--brand-red-dark)); color: #fff; }
+
+        /* ---- WhatsApp float ---- */
         .whatsapp-float {
             position: fixed; bottom: 20px; right: 20px; z-index: 1050;
             background: #25D366; color: #fff; border-radius: 50px;
@@ -28,54 +95,97 @@
         .whatsapp-float:hover { color: #fff; opacity: .9; }
         @media (max-width: 767px) {
             .whatsapp-float { left: 12px; right: 12px; text-align: center; bottom: 12px; border-radius: 8px; }
+            .mega-menu { position: static; box-shadow: none; }
         }
+
+        footer.site-footer { background: #16181A; color: #b8bcc2; }
+        footer.site-footer h5, footer.site-footer h6 { color: #fff; }
+        footer.site-footer a { color: #b8bcc2; text-decoration: none; }
+        footer.site-footer a:hover { color: var(--brand-red); }
+
+        /* ---- Global Bootstrap color overrides ----
+           Every other frontend page (listing, product detail, category,
+           brand, contact, enquiry, quote-request) extends this same
+           layout but still uses plain Bootstrap classes like btn-primary.
+           Overriding them here, once, makes the red theme apply
+           site-wide instead of needing every individual page restyled. */
+        .btn-primary, .badge.bg-primary, .bg-primary { background-color: var(--brand-red) !important; border-color: var(--brand-red) !important; }
+        .btn-primary:hover, .btn-primary:focus { background-color: var(--brand-red-dark) !important; border-color: var(--brand-red-dark) !important; }
+        .btn-outline-primary { color: var(--brand-red) !important; border-color: var(--brand-red) !important; }
+        .btn-outline-primary:hover { background-color: var(--brand-red) !important; color: #fff !important; }
+        .text-primary { color: var(--brand-red) !important; }
+        .border-primary { border-color: var(--brand-red) !important; }
+        main a:not(.btn):not(.dropdown-item):not(.nav-link) { color: var(--brand-red); }
+        .page-link { color: var(--brand-red); }
+        .page-item.active .page-link { background-color: var(--brand-red); border-color: var(--brand-red); }
+        .form-control:focus, .form-select:focus { border-color: var(--brand-red); box-shadow: 0 0 0 .25rem rgba(228,0,43,.15); }
+        /* WhatsApp buttons deliberately stay green (btn-success) — the
+           contrast against the red theme is intentional, same pattern
+           the reference site uses. */
     </style>
 </head>
 <body>
 
-<header class="border-bottom bg-white sticky-top">
+<header class="site-header bg-white sticky-top">
     <nav class="navbar navbar-expand-lg container py-3">
-        <a class="navbar-brand fw-bold fs-4" href="{{ route('home') }}">
-            {{ \App\Models\Setting::get('company_name', config('app.name')) }}
+        <a class="brand-logo text-decoration-none" href="{{ route('home') }}">
+            {{ \App\Models\Setting::get('company_name', config('app.name')) }}<span>.</span>
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="mainNav">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
-                <li class="nav-item"><a class="nav-link" href="{{ route('products.index') }}">Products</a></li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Brands</a>
-                    <ul class="dropdown-menu">
-                        {{-- Section 56: nav queries run on EVERY page — cache them --}}
-                        @foreach(\Illuminate\Support\Facades\Cache::remember('nav.brands', now()->addHour(), fn() => \App\Models\Brand::where('status', true)->orderBy('name')->take(12)->get()) as $navBrand)
-                            <li><a class="dropdown-item" href="{{ route('brands.show', $navBrand) }}">{{ $navBrand->name }}</a></li>
-                        @endforeach
-                    </ul>
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Categories</a>
-                    <ul class="dropdown-menu">
-                        @foreach(\Illuminate\Support\Facades\Cache::remember('nav.categories', now()->addHour(), fn() => \App\Models\Category::whereNull('parent_id')->where('status', true)->orderBy('sort_order')->get()) as $navCategory)
-                            <li><a class="dropdown-item" href="{{ route('categories.show', $navCategory) }}">{{ $navCategory->name }}</a></li>
-                        @endforeach
-                    </ul>
+            <ul class="navbar-nav main-nav me-auto mb-2 mb-lg-0 ms-lg-4 position-relative">
+                <li class="nav-item position-static" id="productsMegaWrap">
+                    <a class="nav-link d-flex align-items-center gap-1" href="{{ route('products.index') }}" id="productsMegaToggle">
+                        Products <i class="bi bi-chevron-down small"></i>
+                    </a>
+                    <div class="mega-menu" id="productsMega">
+                        <div class="container">
+                            <div class="row g-4">
+                                @php
+                                    $megaCategories = \Illuminate\Support\Facades\Cache::remember('nav.mega', now()->addHour(), function () {
+                                        $cats = \App\Models\Category::whereNull('parent_id')->where('status', true)->orderBy('sort_order')->take(8)->get();
+                                        foreach ($cats as $cat) {
+                                            $cat->menuBrands = \App\Models\Brand::whereHas('products', fn($q) => $q->where('category_id', $cat->id)->where('status', true))
+                                                ->where('status', true)->orderBy('name')->take(6)->get();
+                                        }
+                                        return $cats;
+                                    });
+                                @endphp
+                                @foreach($megaCategories as $cat)
+                                    <div class="col-6 col-md-3 mega-col">
+                                        <div class="mega-col-title">
+                                            @if($cat->image)<img src="{{ Storage::url($cat->image) }}" alt="">@else<i class="bi bi-box2 text-danger"></i>@endif
+                                            {{ $cat->name }}
+                                        </div>
+                                        <a href="{{ route('categories.show', $cat) }}" class="fw-semibold" style="color:var(--ink)">View All</a>
+                                        @foreach($cat->menuBrands as $mb)
+                                            <a href="{{ route('brands.show', $mb) }}">{{ $mb->name }}</a>
+                                        @endforeach
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
                 </li>
                 <li class="nav-item"><a class="nav-link" href="{{ route('solutions.index') }}">Solutions</a></li>
                 <li class="nav-item"><a class="nav-link" href="{{ route('blog.index') }}">Blog</a></li>
-                <li class="nav-item"><a class="nav-link" href="{{ route('contact.create') }}">Contact</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ route('contact.create') }}">Contact Us</a></li>
             </ul>
-            <a href="{{ route('enquiry.index') }}" class="btn btn-outline-secondary position-relative me-3">
-                <i class="bi bi-cart3"></i>
+
+            <form action="{{ route('search') }}" method="GET" class="d-flex me-3" role="search">
+                <input type="search" name="q" value="{{ request('q') }}" class="form-control" placeholder="Search products...">
+                <button class="btn btn-outline-brand ms-2"><i class="bi bi-search"></i></button>
+            </form>
+
+            <a href="{{ route('enquiry.index') }}" class="btn btn-outline-brand position-relative">
+                <i class="bi bi-cart3 me-1"></i> Quote List
                 @php($cartCount = app(\App\Services\EnquiryCartService::class)->count())
                 @if($cartCount > 0)
-                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">{{ $cartCount }}</span>
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill quote-badge">{{ $cartCount }}</span>
                 @endif
             </a>
-            <form action="{{ route('search') }}" method="GET" class="d-flex" role="search">
-                <input type="search" name="q" value="{{ request('q') }}" class="form-control" placeholder="Search products...">
-                <button class="btn btn-outline-primary ms-2"><i class="bi bi-search"></i></button>
-            </form>
         </div>
     </nav>
 </header>
@@ -84,37 +194,33 @@
     @yield('content')
 </main>
 
-<footer class="bg-dark text-white-50 py-5 mt-5">
+<footer class="site-footer py-5 mt-5">
     <div class="container">
-        <div class="row">
-            <div class="col-md-4 mb-3">
-                <h5 class="text-white">{{ \App\Models\Setting::get('company_name', config('app.name')) }}</h5>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <h5>{{ \App\Models\Setting::get('company_name', config('app.name')) }}</h5>
                 <p class="small">Enterprise IT products and solutions for businesses across the UAE.</p>
             </div>
-            <div class="col-md-4 mb-3">
-                <h6 class="text-white">Quick Links</h6>
+            <div class="col-md-4">
+                <h6>Quick Links</h6>
                 <ul class="list-unstyled small">
-                    <li><a href="{{ route('products.index') }}" class="text-white-50 text-decoration-none">Products</a></li>
-                    <li><a href="{{ route('solutions.index') }}" class="text-white-50 text-decoration-none">Solutions</a></li>
-                    <li><a href="{{ route('blog.index') }}" class="text-white-50 text-decoration-none">Blog</a></li>
-                    <li><a href="{{ route('contact.create') }}" class="text-white-50 text-decoration-none">Contact</a></li>
+                    <li class="mb-1"><a href="{{ route('products.index') }}">Products</a></li>
+                    <li class="mb-1"><a href="{{ route('solutions.index') }}">Solutions</a></li>
+                    <li class="mb-1"><a href="{{ route('blog.index') }}">Blog</a></li>
+                    <li class="mb-1"><a href="{{ route('contact.create') }}">Contact</a></li>
                     @foreach(\App\Models\Page::where('status', true)->orderBy('title')->get() as $footerPage)
-                        <li><a href="{{ route('pages.show', $footerPage) }}" class="text-white-50 text-decoration-none">{{ $footerPage->title }}</a></li>
+                        <li class="mb-1"><a href="{{ route('pages.show', $footerPage) }}">{{ $footerPage->title }}</a></li>
                     @endforeach
                 </ul>
             </div>
-            <div class="col-md-4 mb-3">
-                <h6 class="text-white">Get in Touch</h6>
-                <p class="small mb-0">{{ \App\Models\Setting::get('address', 'UAE | Dubai') }}</p>
-                @if(\App\Models\Setting::get('email'))
-                    <p class="small mb-0">{{ \App\Models\Setting::get('email') }}</p>
-                @endif
-                @if(\App\Models\Setting::get('phone'))
-                    <p class="small mb-0">{{ \App\Models\Setting::get('phone') }}</p>
-                @endif
+            <div class="col-md-4">
+                <h6>Get in Touch</h6>
+                <p class="small mb-1">{{ \App\Models\Setting::get('address', 'UAE | Dubai') }}</p>
+                @if(\App\Models\Setting::get('email'))<p class="small mb-1">{{ \App\Models\Setting::get('email') }}</p>@endif
+                @if(\App\Models\Setting::get('phone'))<p class="small mb-1">{{ \App\Models\Setting::get('phone') }}</p>@endif
             </div>
         </div>
-        <hr class="border-secondary">
+        <hr style="border-color:#2a2d30;">
         <p class="small mb-0 text-center">&copy; {{ date('Y') }} {{ \App\Models\Setting::get('company_name', config('app.name')) }}. All rights reserved.</p>
     </div>
 </footer>
@@ -124,6 +230,26 @@
 </a>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Simple hover-controlled mega menu (desktop) / click-to-toggle (mobile)
+    const megaWrap = document.getElementById('productsMegaWrap');
+    const megaMenu = document.getElementById('productsMega');
+    const megaToggle = document.getElementById('productsMegaToggle');
+    let hideTimer;
+
+    function showMega() { clearTimeout(hideTimer); megaMenu.classList.add('show'); }
+    function hideMegaDelayed() { hideTimer = setTimeout(() => megaMenu.classList.remove('show'), 150); }
+
+    if (window.innerWidth > 991) {
+        megaWrap.addEventListener('mouseenter', showMega);
+        megaWrap.addEventListener('mouseleave', hideMegaDelayed);
+    } else {
+        megaToggle.addEventListener('click', function (e) {
+            e.preventDefault();
+            megaMenu.classList.toggle('show');
+        });
+    }
+</script>
 @yield('scripts')
 </body>
 </html>

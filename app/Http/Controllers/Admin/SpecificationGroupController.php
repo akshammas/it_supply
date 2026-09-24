@@ -30,6 +30,12 @@ class SpecificationGroupController extends Controller
             'sort_order' => ['nullable', 'integer', 'min:0'],
         ]);
 
+        // A blank sort_order field validates as null, but an explicit
+        // NULL sent to the database overrides the column's DEFAULT 0 —
+        // MySQL only applies a column default when it's omitted from the
+        // INSERT entirely, not when NULL is passed on purpose.
+        $data['sort_order'] ??= 0;
+
         SpecificationGroup::create($data);
 
         return back()->with('status', 'Specification group added.');
@@ -41,6 +47,8 @@ class SpecificationGroupController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'sort_order' => ['nullable', 'integer', 'min:0'],
         ]);
+
+        $data['sort_order'] ??= 0;
 
         $specificationGroup->update($data);
 
