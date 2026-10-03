@@ -41,7 +41,15 @@
         .btn-outline-brand:hover { background: var(--brand-red); color: #fff; }
         .quote-badge { background: var(--brand-red); }
 
-        /* ---- Mega menu ---- */
+        /* ---- Mega menu ----
+           IMPORTANT: this is positioned absolute + left:0/right:0, which
+           stretches it to fill its nearest *positioned* ancestor.
+           That ancestor must be the <nav class="navbar ..."> (Bootstrap's
+           .navbar is position:relative by default), NOT the <ul> of nav
+           links — a <ul> is only as wide as its own links, so if the ul
+           were the positioned ancestor the whole mega-menu (and all its
+           category columns) would be squeezed into that narrow width and
+           overlap. Do not add position-relative back onto the <ul>. */
         .mega-menu {
             position: absolute; left: 0; right: 0; top: 100%;
             background: #fff; border-top: 3px solid var(--brand-red);
@@ -49,9 +57,35 @@
             padding: 1.75rem 0; display: none; z-index: 1030;
         }
         .mega-menu.show { display: block; }
-        .mega-col-title { font-weight: 700; font-size: .95rem; color: var(--ink); margin-bottom: .6rem; display: flex; align-items: center; gap: .5rem; }
-        .mega-col-title img { width: 22px; height: 22px; object-fit: contain; }
-        .mega-col a { display: block; font-size: .85rem; color: var(--muted); text-decoration: none; padding: .2rem 0; }
+
+        /* Column title: icon + label, both fixed to a common baseline */
+        .mega-col-title {
+            font-weight: 700; font-size: .95rem; color: var(--ink);
+            margin-bottom: .6rem; display: flex; align-items: center; gap: .5rem;
+        }
+        /* Fixed-width icon slot so text below can indent by the exact same amount */
+        .mega-col-icon {
+            width: 22px; height: 22px; flex-shrink: 0;
+            display: inline-flex; align-items: center; justify-content: center;
+        }
+        .mega-col-icon img { width: 22px; height: 22px; object-fit: contain; }
+        .mega-col-icon i { font-size: 1rem; line-height: 1; }
+
+        /* Column wrapper: prevent flex/grid children from ignoring
+           min-content and forcing overlap when text is long (e.g.
+           "Western Digital", "Keyboards & Mice") */
+        .mega-col { min-width: 0; }
+        .mega-col-title span:last-child {
+            overflow-wrap: break-word;
+            min-width: 0;
+        }
+
+        /* Sub-links: indented to line up under the title text, not the icon */
+        .mega-col a {
+            display: block; font-size: .85rem; color: var(--muted);
+            text-decoration: none;
+            padding: .2rem 0 .2rem 30px; /* 22px icon + .5rem (8px) gap = 30px */
+        }
         .mega-col a:hover { color: var(--brand-red); }
 
         /* ---- Category strip ---- */
@@ -135,7 +169,14 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="mainNav">
-            <ul class="navbar-nav main-nav me-auto mb-2 mb-lg-0 ms-lg-4 position-relative">
+            <!-- NOTE: position-relative removed from this <ul> on purpose.
+                 Bootstrap's .navbar (the parent <nav>) is already
+                 position:relative by default, so the mega-menu's
+                 absolute left:0/right:0 now spans the full nav container
+                 width instead of just this list's width. Do not re-add
+                 position-relative here — it will reintroduce the
+                 overlapping/squeezed-columns bug. -->
+            <ul class="navbar-nav main-nav me-auto mb-2 mb-lg-0 ms-lg-4">
                 <li class="nav-item position-static" id="productsMegaWrap">
                     <a class="nav-link d-flex align-items-center gap-1" href="{{ route('products.index') }}" id="productsMegaToggle">
                         Products <i class="bi bi-chevron-down small"></i>
@@ -156,8 +197,14 @@
                                 @foreach($megaCategories as $cat)
                                     <div class="col-6 col-md-3 mega-col">
                                         <div class="mega-col-title">
-                                            @if($cat->image)<img src="{{ Storage::url($cat->image) }}" alt="">@else<i class="bi bi-box2 text-danger"></i>@endif
-                                            {{ $cat->name }}
+                                            <span class="mega-col-icon">
+                                                @if($cat->image)
+                                                    <img src="{{ Storage::url($cat->image) }}" alt="">
+                                                @else
+                                                    <i class="bi bi-box2 text-danger"></i>
+                                                @endif
+                                            </span>
+                                            <span>{{ $cat->name }}</span>
                                         </div>
                                         <a href="{{ route('categories.show', $cat) }}" class="fw-semibold" style="color:var(--ink)">View All</a>
                                         @foreach($cat->menuBrands as $mb)
