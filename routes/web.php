@@ -11,7 +11,6 @@ use App\Http\Controllers\Frontend\ProductController;
 use App\Http\Controllers\Frontend\QuoteRequestController;
 use App\Http\Controllers\Frontend\SearchController;
 use App\Http\Controllers\Frontend\SitemapController;
-use App\Http\Controllers\Frontend\SolutionController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -35,6 +34,8 @@ Route::get('/categories/{category:slug}', [CategoryController::class, 'show'])->
 Route::get('/brands/{brand:slug}', [BrandController::class, 'show'])->name('brands.show');
 
 Route::get('/search', [SearchController::class, 'index'])->name('search');
+
+
 
 Route::get('/enquiry', [EnquiryCartController::class, 'index'])->name('enquiry.index');
 Route::post('/enquiry/add/{product}', [EnquiryCartController::class, 'add'])->name('enquiry.add');
@@ -67,6 +68,8 @@ Route::get('/robots.txt', function () {
 })->name('robots');
 
 require __DIR__.'/admin.php';
+
+Route::view('/about-us', 'frontend.about')->name('about');
 
 // CATCH-ALL — must stay last. See note at top of file.
 Route::get('/{page:slug}', [PageController::class, 'show'])->name('pages.show');

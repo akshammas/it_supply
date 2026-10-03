@@ -214,7 +214,7 @@
                         </div>
                     </div>
                 </li>
-                <li class="nav-item"><a class="nav-link" href="#">About us</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ route('about') }}">About us</a></li>
                 <li class="nav-item"><a class="nav-link" href="{{ route('blog.index') }}">Blog</a></li>
                 <li class="nav-item"><a class="nav-link" href="{{ route('contact.create') }}">Contact Us</a></li>
             </ul>
@@ -250,7 +250,7 @@
                 <h6>Quick Links</h6>
                 <ul class="list-unstyled small">
                     <li class="mb-1"><a href="{{ route('products.index') }}">Products</a></li>
-                    <li class="mb-1"><a href="#">about us</a></li>
+                    <li class="mb-1"><a href="{{ route('about') }}">about us</a></li>
                     <li class="mb-1"><a href="{{ route('blog.index') }}">Blog</a></li>
                     <li class="mb-1"><a href="{{ route('contact.create') }}">Contact</a></li>
                     @foreach(\App\Models\Page::where('status', true)->orderBy('title')->get() as $footerPage)
