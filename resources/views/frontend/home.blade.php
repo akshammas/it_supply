@@ -123,37 +123,7 @@
     </section>
     @endif
 
-    {{-- SOLUTIONS --}}
-    @if($solutions->isNotEmpty())
-    <section class="py-5" style="background:#FAFAFA;">
-        <div class="container">
-            <div class="d-flex justify-content-between align-items-end mb-4">
-                <div>
-                    <div class="section-eyebrow">Our Expertise</div>
-                    <h2 class="section-title mb-0">Solutions</h2>
-                </div>
-                <a href="{{ route('solutions.index') }}" class="fw-semibold text-decoration-none" style="color:var(--brand-red);">View all &rarr;</a>
-            </div>
-            <div class="row">
-                @foreach($solutions as $solution)
-                    <div class="col-md-4 mb-4">
-                        <a href="{{ route('solutions.show', $solution) }}" class="text-decoration-none" style="color:var(--ink);">
-                            <div class="card h-100 border-0 shadow-sm">
-                                @if($solution->image)
-                                    <img src="{{ Storage::url($solution->image) }}" class="card-img-top" style="height:160px; object-fit:cover;">
-                                @endif
-                                <div class="card-body">
-                                    <h5 class="card-title">{{ $solution->name }}</h5>
-                                    <p class="card-text text-muted small">{{ Str::limit($solution->short_description, 100) }}</p>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-                @endforeach
-            </div>
-        </div>
-    </section>
-    @endif
+    
 
     {{-- TRUST BADGES --}}
     <section class="container py-5">

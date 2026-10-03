@@ -37,9 +37,6 @@ class HomeController extends Controller
                     ->latest()
                     ->take(8)
                     ->get(),
-                'solutions' => Solution::where('status', true)
-                    ->take(6)
-                    ->get(),
                 'heroBanners' => Banner::where('position', 'home_hero')
                     ->where('status', true)
                     ->orderBy('sort_order')

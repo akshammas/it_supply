@@ -32,7 +32,6 @@
             <li class="nav-item"><a href="#" class="nav-link text-white-50"><i class="bi bi-file-earmark-text me-2"></i>Quotes</a></li>
 
             <li class="nav-item mt-2"><span class="text-uppercase small text-white-50">Content</span></li>
-            <li class="nav-item"><a href="{{ route('admin.solutions.index') }}" class="nav-link text-white-50"><i class="bi bi-lightbulb me-2"></i>Solutions</a></li>
             <li class="nav-item"><a href="{{ route('admin.blog.index') }}" class="nav-link text-white-50"><i class="bi bi-journal-text me-2"></i>Blog</a></li>
             <li class="nav-item"><a href="{{ route('admin.pages.index') }}" class="nav-link text-white-50"><i class="bi bi-file-earmark me-2"></i>Pages</a></li>
             <li class="nav-item"><a href="{{ route('admin.banners.index') }}" class="nav-link text-white-50"><i class="bi bi-images me-2"></i>Banners</a></li>

@@ -48,8 +48,6 @@ Route::get('/thank-you', [QuoteRequestController::class, 'thankYou'])->name('quo
 Route::get('/contact', [ContactController::class, 'create'])->name('contact.create');
 Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
 
-Route::get('/solutions', [SolutionController::class, 'index'])->name('solutions.index');
-Route::get('/solutions/{solution:slug}', [SolutionController::class, 'show'])->name('solutions.show');
 
 Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
 Route::get('/blog/{post:slug}', [BlogController::class, 'show'])->name('blog.show');
