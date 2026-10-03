@@ -47,6 +47,21 @@
                             <img src="{{ Storage::url($category->image) }}" class="mt-2 rounded" style="max-height:80px">
                         @endif
                     </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Icon <span class="text-muted small">(optional)</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text justify-content-center" style="width:48px;">
+                                <i id="iconPreview" class="bi {{ old('icon', $category->icon) ?: 'bi-box2' }}"></i>
+                            </span>
+                            <input type="text" name="icon" id="icon" value="{{ old('icon', $category->icon) }}"
+                                class="form-control" placeholder="e.g. bi-laptop">
+                        </div>
+                        <div class="form-text">
+                            Used when no image is uploaded. Names from
+                            <a href="https://icons.getbootstrap.com" target="_blank" rel="noopener">icons.getbootstrap.com</a>,
+                            e.g. <code>bi-laptop</code>, <code>bi-hdd-network</code>, <code>bi-printer</code>.
+                        </div>
+                    </div>
                     <div class="col-md-6 d-flex align-items-end">
                         <div class="form-check">
                             <input type="checkbox" name="status" value="1" class="form-check-input" id="status" @checked(old('status', $category->status ?? true))>
@@ -74,4 +89,12 @@
         <button class="btn btn-primary">Save Category</button>
         <a href="{{ route('admin.categories.index') }}" class="btn btn-outline-secondary">Cancel</a>
     </form>
+    
+    <script>
+        document.getElementById('icon').addEventListener('input', function () {
+            let v = this.value.trim().toLowerCase().replace(/^bi\s+/, '');
+            if (v && !v.startsWith('bi-')) v = 'bi-' + v;
+            document.getElementById('iconPreview').className = 'bi ' + (v || 'bi-box2');
+        });
+    </script>
 @endsection

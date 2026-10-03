@@ -4,8 +4,8 @@
 @section('content')
 
     {{-- HERO --}}
-    @if($heroBanners->isNotEmpty())
-        <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
+     @if($heroBanners->isNotEmpty())
+        <div id="heroCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="5000">
             @if($heroBanners->count() > 1)
                 <div class="carousel-indicators">
                     @foreach($heroBanners as $banner)
@@ -16,21 +16,20 @@
             <div class="carousel-inner">
                 @foreach($heroBanners as $banner)
                     <div class="carousel-item {{ $loop->first ? 'active' : '' }}">
-                        <div class="text-white d-flex align-items-center" style="height:420px; background:#111 url('{{ Storage::url($banner->image) }}') center/cover;">
-                            <div class="container text-center py-4">
-                                <h1 class="display-5 fw-bold">{{ $banner->title ?: \App\Models\Setting::get('hero_title', 'Enterprise IT Products & Solutions') }}</h1>
-                                <p class="lead text-white-50">{{ $banner->subtitle ?: \App\Models\Setting::get('hero_subtitle', 'For Businesses Across UAE') }}</p>
-                                <a href="{{ route('products.index') }}" class="btn btn-brand btn-lg me-2">Explore Products</a>
-                                <a href="{{ $banner->link_url ?: route('quote-request.create') }}" class="btn btn-outline-light btn-lg">{{ $banner->button_text ?: 'Request a Quote' }}</a>
+                        <div class="position-relative overflow-hidden text-white d-flex align-items-center" style="height:420px; background:#111;">
+                            <div class="hero-bg" style="background-image:url('{{ Storage::url($banner->image) }}');"></div>
+                            <div class="container position-relative text-center py-4">
+                                <h1 class="display-5 fw-bold hero-anim">{{ $banner->title ?: \App\Models\Setting::get('hero_title', 'Enterprise IT Products & Solutions') }}</h1>
+                                <p class="lead text-white-50 hero-anim">{{ $banner->subtitle ?: \App\Models\Setting::get('hero_subtitle', 'For Businesses Across UAE') }}</p>
+                                <div class="hero-anim">
+                                    <a href="{{ route('products.index') }}" class="btn btn-brand btn-lg me-2">Explore Products</a>
+                                    <a href="{{ $banner->link_url ?: route('quote-request.create') }}" class="btn btn-outline-light btn-lg">{{ $banner->button_text ?: 'Request a Quote' }}</a>
+                                </div>
                             </div>
                         </div>
                     </div>
                 @endforeach
             </div>
-            @if($heroBanners->count() > 1)
-                <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev"><span class="carousel-control-prev-icon"></span></button>
-                <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next"><span class="carousel-control-next-icon"></span></button>
-            @endif
         </div>
     @else
         <section style="background:var(--ink);" class="text-white py-5">
@@ -45,22 +44,36 @@
 
     {{-- PROMO BANNERS --}}
     @if($promoBanners->isNotEmpty())
-    <section class="container py-4">
-        <div class="row">
-            @foreach($promoBanners as $banner)
-                <div class="col-md-{{ 12 / min($promoBanners->count(), 3) }} mb-3">
-                    <a href="{{ $banner->link_url ?: '#' }}" class="d-block position-relative text-decoration-none">
-                        <img src="{{ Storage::url($banner->image) }}" class="img-fluid rounded w-100" style="height:150px; object-fit:cover;">
-                        @if($banner->title)
-                            <div class="position-absolute bottom-0 start-0 p-3 text-white" style="background:linear-gradient(transparent, rgba(0,0,0,.65)); width:100%;">
-                                <div class="fw-semibold">{{ $banner->title }}</div>
-                            </div>
-                        @endif
-                    </a>
-                </div>
-            @endforeach
-        </div>
-    </section>
+        <section class="container py-4">
+            <div class="row justify-content-center">
+                @foreach($promoBanners as $banner)
+                    @php
+                        // Real size of the uploaded image (falls back to 2:1 if it can't be read)
+                        $file = Storage::disk('public')->path($banner->image);
+                        $size = is_file($file) ? @getimagesize($file) : false;
+                        $w = $size[0] ?? 800;
+                        $h = $size[1] ?? 400;
+                    @endphp
+                    <div class="col-12 col-md-{{ 12 / min($promoBanners->count(), 3) }} mb-3">
+                        <a href="{{ $banner->link_url ?: '#' }}"
+                        class="d-block position-relative overflow-hidden rounded text-decoration-none">
+                            <img src="{{ Storage::url($banner->image) }}"
+                                alt="{{ $banner->title ?? 'Promotion' }}"
+                                class="img-fluid w-100 d-block"
+                                width="{{ $w }}" height="{{ $h }}"
+                                loading="lazy" decoding="async"
+                                style="aspect-ratio: {{ $w }} / {{ $h }};">
+                            @if($banner->title)
+                                <div class="position-absolute bottom-0 start-0 w-100 p-3 text-white"
+                                    style="background:linear-gradient(transparent, rgba(0,0,0,.65));">
+                                    <div class="fw-semibold">{{ $banner->title }}</div>
+                                </div>
+                            @endif
+                        </a>
+                    </div>
+                @endforeach
+            </div>
+        </section>
     @endif
 
     {{-- TOP BRANDS — grid, max 5 per row --}}
@@ -96,11 +109,7 @@
                 <div class="col">
                     <a href="{{ route('categories.show', $category) }}" class="category-chip">
                         <div class="chip-icon">
-                            @if($category->image)
-                                <img src="{{ Storage::url($category->image) }}" style="width:32px; height:32px; object-fit:contain;">
-                            @else
-                                <i class="bi bi-box2 fs-5 text-danger"></i>
-                            @endif
+                            @include('frontend.partials.category-icon', ['category' => $category, 'size' => 32, 'iconClass' => 'fs-5 text-danger'])
                         </div>
                         <div class="chip-label">{{ $category->name }}</div>
                     </a>

@@ -6,3 +6,11 @@
 @import '@fontsource/inter/600.css';
 @import '@fontsource/inter/700.css';
 @import '@fontsource/inter/800.css';
+
+/* Single promo banner on desktop: keep it a little shorter */
+@media (min-width: 992px) {
+    .promo-single .promo-img {
+        max-height: 200px;   /* change this number to taste */
+        object-fit: cover;
+    }
+}

@@ -15,16 +15,28 @@ class Category extends Model
     use LogsActivity;
     use BustsFrontendCache;
 
-    protected array $frontendCacheKeys = ['nav.categories', 'homepage.data', 'sitemap.xml'];
+    protected array $frontendCacheKeys = ['nav.categories', 'nav.mega', 'homepage.data', 'sitemap.xml'];
 
     protected $fillable = [
         'parent_id', 'name', 'slug', 'description', 'image',
-        'meta_title', 'meta_description', 'status', 'sort_order',
+        'meta_title', 'meta_description', 'status', 'sort_order','icon'
     ];
 
     protected $casts = [
         'status' => 'boolean',
     ];
+
+    public function setIconAttribute($value): void
+    {
+        $value = strtolower(trim((string) $value));
+        $value = preg_replace('/^bi\s+/', '', $value);      // "bi bi-laptop" -> "bi-laptop"
+
+        if ($value !== '' && !str_starts_with($value, 'bi-')) {
+            $value = 'bi-' . $value;                        // "laptop" -> "bi-laptop"
+        }
+
+        $this->attributes['icon'] = $value !== '' ? $value : null;
+    }
 
     public function parent(): BelongsTo
     {
@@ -40,4 +52,5 @@ class Category extends Model
     {
         return $this->hasMany(Product::class);
     }
+    
 }

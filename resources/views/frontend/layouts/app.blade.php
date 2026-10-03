@@ -154,6 +154,68 @@
         /* WhatsApp buttons deliberately stay green (btn-success) — the
            contrast against the red theme is intentional, same pattern
            the reference site uses. */
+
+        @media (min-width: 992px) {
+        .promo-single .promo-img {
+            max-height: 200px;   /* change this number to taste */
+                object-fit: cover;
+            }
+        }
+        /* ===== Hero carousel animation ===== */
+#heroCarousel .hero-bg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    will-change: transform;
+}
+
+/* Slower cross-fade (Bootstrap's default is 0.6s) */
+#heroCarousel.carousel-fade .carousel-item {
+    transition-duration: 1s;
+}
+#heroCarousel.carousel-fade .active.carousel-item-start,
+#heroCarousel.carousel-fade .active.carousel-item-end {
+    transition: opacity 0s 1s;   /* keep this delay equal to the duration above */
+}
+
+/* Slow zoom + text entrance, starting as the next slide begins to fade in */
+#heroCarousel .carousel-item:is(.active, .carousel-item-next, .carousel-item-prev) .hero-bg {
+    animation: heroZoom 9s ease-out both;
+}
+#heroCarousel .carousel-item:is(.active, .carousel-item-next, .carousel-item-prev) .hero-anim {
+    animation: heroFadeUp .9s cubic-bezier(.22, .61, .36, 1) both;
+}
+#heroCarousel .carousel-item:is(.active, .carousel-item-next, .carousel-item-prev) .hero-anim:nth-child(1) { animation-delay: .25s; }
+#heroCarousel .carousel-item:is(.active, .carousel-item-next, .carousel-item-prev) .hero-anim:nth-child(2) { animation-delay: .45s; }
+#heroCarousel .carousel-item:is(.active, .carousel-item-next, .carousel-item-prev) .hero-anim:nth-child(3) { animation-delay: .65s; }
+
+@keyframes heroZoom {
+    from { transform: scale(1); }
+    to   { transform: scale(1.08); }
+}
+@keyframes heroFadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Smooth button hover */
+#heroCarousel .btn {
+    transition: transform .2s ease, box-shadow .2s ease, background-color .2s ease, color .2s ease;
+}
+#heroCarousel .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, .25);
+}
+
+/* Respect visitors who turn animations off in their system settings */
+@media (prefers-reduced-motion: reduce) {
+    #heroCarousel .hero-bg,
+    #heroCarousel .hero-anim { animation: none !important; }
+}
+@media (max-width: 767px) {
+    .mega-menu { position: static; box-shadow: none; }
+}
     </style>
 </head>
 <body>
@@ -196,11 +258,7 @@
                                     <div class="col-6 col-md-3 mega-col">
                                         <div class="mega-col-title">
                                             <span class="mega-col-icon">
-                                                @if($cat->image)
-                                                    <img src="{{ Storage::url($cat->image) }}" alt="">
-                                                @else
-                                                    <i class="bi bi-box2 text-danger"></i>
-                                                @endif
+                                                @include('frontend.partials.category-icon', ['category' => $cat, 'size' => 22, 'iconClass' => 'text-danger'])
                                             </span>
                                             <span>{{ $cat->name }}</span>
                                         </div>
@@ -270,9 +328,7 @@
     </div>
 </footer>
 
-<a href="https://wa.me/{{ \App\Models\Setting::get('whatsapp_number', '971500000000') }}" target="_blank" class="whatsapp-float">
-    <i class="bi bi-whatsapp me-1"></i> WhatsApp Us
-</a>
+@include('frontend.partials.whatsapp-chat')
 
 
 <script>
