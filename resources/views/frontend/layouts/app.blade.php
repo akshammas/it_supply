@@ -14,9 +14,7 @@
     <meta property="og:image" content="@yield('og_image', \App\Models\Setting::get('logo') ? Storage::url(\App\Models\Setting::get('logo')) : '')">
     <meta name="twitter:card" content="summary_large_image">
 
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+   
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>
@@ -110,7 +108,7 @@
             transition: .15s;
         }
         .brand-tile:hover { border-color: var(--brand-red); box-shadow: 0 4px 12px rgba(228,0,43,.1); }
-        .brand-tile img { max-height: 40px; max-width: 100%; object-fit: contain; }
+        .brand-tile img { max-height: 60px; max-width: 100%; object-fit: contain; }
 
         /* ---- Section headers ---- */
         .section-eyebrow { color: var(--brand-red); font-weight: 700; font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; }
@@ -276,7 +274,7 @@
     <i class="bi bi-whatsapp me-1"></i> WhatsApp Us
 </a>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+
 <script>
     // Simple hover-controlled mega menu (desktop) / click-to-toggle (mobile)
     const megaWrap = document.getElementById('productsMegaWrap');
