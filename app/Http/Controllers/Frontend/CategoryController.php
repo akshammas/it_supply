@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Models\Banner;
 use Illuminate\View\View;
 
 class CategoryController extends Controller
@@ -20,6 +21,12 @@ class CategoryController extends Controller
 
         $children = $category->children()->where('status', true)->orderBy('sort_order')->get();
 
-        return view('frontend.categories.show', compact('category', 'products', 'children'));
+        $topBanners = Banner::where('position', 'category_top')
+            ->where('status', true)
+            ->orderBy('sort_order')
+            ->get();
+
+        return view('frontend.categories.show', compact('category', 'products', 'children', 'topBanners'));
+
     }
 }
