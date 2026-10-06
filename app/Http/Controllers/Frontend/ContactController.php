@@ -20,18 +20,27 @@ class ContactController extends Controller
 {
     public function create(): View
     {
-        return view('frontend.contact.create');
+        return view('frontend.contact.create', [
+            'enquiryTypes' => StoreContactRequest::ENQUIRY_TYPES,
+        ]);
     }
 
     public function store(StoreContactRequest $request): RedirectResponse
     {
         $data = $request->validated();
 
+        // The enquiries table has no "subject" column, so the enquiry type goes at the top of the message
+        $message = $data['message'];
+        if (! empty($data['enquiry_type'])) {
+            $message = 'Enquiry type: '.$data['enquiry_type']."\n\n".$message;
+        }
+
         $enquiry = Enquiry::create([
             'name' => $data['name'],
+            'company_name' => $data['company_name'] ?? null,
             'email' => $data['email'],
             'phone' => $data['phone'] ?? '',
-            'message' => $data['message'],
+            'message' => $message,
             'status' => 'new',
         ]);
 
@@ -40,6 +49,7 @@ class ContactController extends Controller
             Mail::to($adminEmail)->queue(new NewEnquiryReceived($enquiry));
         }
 
-        return redirect()->route('contact.create')->with('status', 'Thanks — we\'ll get back to you shortly.');
+        return redirect(route('contact.create').'#contact-form')
+            ->with('status', 'Thanks — we\'ll get back to you shortly.');
     }
 }

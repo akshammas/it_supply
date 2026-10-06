@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Banner extends Model
 {
@@ -16,6 +17,11 @@ class Banner extends Model
     protected $casts = [
         'status' => 'boolean',
     ];
+
+    public function categories(): BelongsToMany
+        {
+            return $this->belongsToMany(Category::class, 'banner_category');
+        }
 
 
     protected array $frontendCacheKeys = ['homepage.data'];

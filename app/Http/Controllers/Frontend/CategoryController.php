@@ -23,6 +23,10 @@ class CategoryController extends Controller
 
         $topBanners = Banner::where('position', 'category_top')
             ->where('status', true)
+            ->where(function ($q) use ($category) {
+                $q->whereDoesntHave('categories')   // nothing ticked = every category
+                  ->orWhereHas('categories', fn ($c) => $c->where('categories.id', $category->id));
+            })
             ->orderBy('sort_order')
             ->get();
 
