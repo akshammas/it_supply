@@ -11,7 +11,7 @@
             <li class="breadcrumb-item active">{{ $brand->name }}</li>
         </ol>
     </nav>
-
+    @include('frontend.partials.top-banners', ['banners' => $topBanners, 'carouselId' => 'brandTopCarousel'])
     <div class="d-flex align-items-center gap-3 mb-3">
         @if($brand->logo)
             <img src="{{ Storage::url($brand->logo) }}" style="max-height:60px;" alt="{{ $brand->name }}">

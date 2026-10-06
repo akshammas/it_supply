@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Banner;
+use App\Models\Brand;
 use App\Models\Category;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -14,15 +15,16 @@ class BannerController extends Controller
     public function index(): View
     {
         return view('admin.banners.index', [
-            'banners' => Banner::with('categories')->orderBy('sort_order')->paginate(20),
+            'banners' => Banner::with(['categories', 'brands'])->orderBy('sort_order')->paginate(20),
         ]);
     }
 
     public function create(): View
     {
         return view('admin.banners.form', [
-            'banner' => new Banner(),
+            'banner'     => new Banner(),
             'categories' => $this->categoryOptions(),
+            'brands'     => $this->brandOptions(),
         ]);
     }
 
@@ -30,21 +32,24 @@ class BannerController extends Controller
     {
         $data = $this->validated($request);
         $data['image'] = $request->file('image')->store('banners', 'public');
-        $categoryIds = $this->takeCategoryIds($data);
+
+        [$categoryIds, $brandIds] = $this->takeTargets($data);
 
         $banner = Banner::create($data);
         $banner->categories()->sync($categoryIds);
+        $banner->brands()->sync($brandIds);
 
         return redirect()->route('admin.banners.index')->with('status', 'Banner created.');
     }
 
     public function edit(Banner $banner): View
     {
-        $banner->load('categories');
+        $banner->load(['categories', 'brands']);
 
         return view('admin.banners.form', [
-            'banner' => $banner,
+            'banner'     => $banner,
             'categories' => $this->categoryOptions(),
+            'brands'     => $this->brandOptions(),
         ]);
     }
 
@@ -56,10 +61,11 @@ class BannerController extends Controller
             $data['image'] = $request->file('image')->store('banners', 'public');
         }
 
-        $categoryIds = $this->takeCategoryIds($data);
+        [$categoryIds, $brandIds] = $this->takeTargets($data);
 
         $banner->update($data);
         $banner->categories()->sync($categoryIds);
+        $banner->brands()->sync($brandIds);
 
         return redirect()->route('admin.banners.index')->with('status', 'Banner updated.');
     }
@@ -74,34 +80,49 @@ class BannerController extends Controller
     protected function validated(Request $request, bool $required = true): array
     {
         $data = $request->validate([
-            'title' => ['nullable', 'string', 'max:255'],
-            'subtitle' => ['nullable', 'string', 'max:255'],
-            'image' => [$required ? 'required' : 'nullable', 'image', 'max:2048'],
-            'link_url' => ['nullable', 'string', 'max:500'],
-            'button_text' => ['nullable', 'string', 'max:100'],
-            'position' => ['required', 'string', 'max:50'],
-            'sort_order' => ['nullable', 'integer', 'min:0'],
-            'category_ids' => ['nullable', 'array'],
-            'category_ids.*' => ['integer', 'exists:categories,id'],
+            'title'         => ['nullable', 'string', 'max:255'],
+            'subtitle'      => ['nullable', 'string', 'max:255'],
+            'image'         => [$required ? 'required' : 'nullable', 'image', 'max:2048'],
+            'link_url'      => ['nullable', 'string', 'max:500'],
+            'button_text'   => ['nullable', 'string', 'max:100'],
+            'position'      => ['required', 'string', 'in:home_hero,home_promo,category_top,brand_top'],
+            'sort_order'    => ['nullable', 'integer', 'min:0'],
+            'brand_ids'     => ['required_if:position,brand_top', 'nullable', 'array'],
+            'brand_ids.*'   => ['integer', 'exists:brands,id'],
+            'brand_ids'     => ['nullable', 'array'],
+            'brand_ids.*'   => ['integer', 'exists:brands,id'],
+        ],[
+            'brand_ids.required_if' => 'Tick at least one brand for a Brand Page Top banner.',
         ]);
 
-        // An unticked checkbox sends nothing, so read it explicitly
+        // Unchecked checkbox sends nothing, so read it explicitly.
         $data['status'] = $request->boolean('status');
 
         return $data;
     }
 
-    /** Pull category_ids out of the banner data; only "Category Page Top" banners keep them. */
-    protected function takeCategoryIds(array &$data): array
+    /**
+     * Pull the target ids out of $data. Categories only count for
+     * category_top, brands only for brand_top; anything else is cleared.
+     * Empty list = "show on every category / every brand page".
+     */
+    protected function takeTargets(array &$data): array
     {
-        $ids = $data['position'] === 'category_top' ? ($data['category_ids'] ?? []) : [];
-        unset($data['category_ids']);
+        $categoryIds = $data['position'] === 'category_top' ? ($data['category_ids'] ?? []) : [];
+        $brandIds    = $data['position'] === 'brand_top'    ? ($data['brand_ids'] ?? [])    : [];
 
-        return array_map('intval', $ids);
+        unset($data['category_ids'], $data['brand_ids']);
+
+        return [$categoryIds, $brandIds];
     }
 
     protected function categoryOptions()
     {
         return Category::with('parent')->orderBy('name')->get();
+    }
+
+    protected function brandOptions()
+    {
+        return Brand::orderBy('name')->get(['id', 'name']);
     }
 }

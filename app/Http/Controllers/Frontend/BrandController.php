@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Frontend;
 use App\Http\Controllers\Controller;
 use App\Models\Brand;
 use Illuminate\View\View;
+use App\Models\Banner;
 
 class BrandController extends Controller
 {
@@ -18,6 +19,12 @@ class BrandController extends Controller
             ->latest()
             ->paginate(24);
 
-        return view('frontend.brands.show', compact('brand', 'products'));
+        $topBanners = Banner::where('position', 'brand_top')
+            ->where('status', true)
+            ->whereHas('brands', fn ($b) => $b->where('brands.id', $brand->id))
+            ->orderBy('sort_order')
+            ->get();
+
+        return view('frontend.brands.show', compact('brand', 'products', 'topBanners'));
     }
 }
