@@ -39,52 +39,104 @@
         .btn-outline-brand:hover { background: var(--brand-red); color: #fff; }
         .quote-badge { background: var(--brand-red); }
 
-        /* ---- Mega menu ----
-           IMPORTANT: this is positioned absolute + left:0/right:0, which
-           stretches it to fill its nearest *positioned* ancestor.
-           That ancestor must be the <nav class="navbar ..."> (Bootstrap's
-           .navbar is position:relative by default), NOT the <ul> of nav
-           links — a <ul> is only as wide as its own links, so if the ul
-           were the positioned ancestor the whole mega-menu (and all its
-           category columns) would be squeezed into that narrow width and
-           overlap. Do not add position-relative back onto the <ul>. */
-        .mega-menu {
-            position: absolute; left: 0; right: 0; top: 100%;
-            background: #fff; border-top: 3px solid var(--brand-red);
-            box-shadow: 0 12px 24px rgba(0,0,0,.08);
-            padding: 1.75rem 0; display: none; z-index: 1030;
-        }
-        .mega-menu.show { display: block; }
+/* ---- Nav links: sliding underline ---- */
+.main-nav .nav-link { position: relative; }
+.main-nav .nav-link::after {
+    content: ""; position: absolute; left: 1rem; right: 1rem; bottom: 2px; height: 2px;
+    background: var(--brand-red); border-radius: 2px;
+    transform: scaleX(0); transform-origin: left; transition: transform .25s ease;
+}
+.main-nav .nav-link:hover::after, .main-nav .nav-link.show::after { transform: scaleX(1); }
+#productsMegaToggle .bi-chevron-down { transition: transform .25s ease; }
+#productsMegaToggle.show .bi-chevron-down { transform: rotate(180deg); }
 
-        /* Column title: icon + label, both fixed to a common baseline */
-        .mega-col-title {
-            font-weight: 700; font-size: .95rem; color: var(--ink);
-            margin-bottom: .6rem; display: flex; align-items: center; gap: .5rem;
-        }
-        /* Fixed-width icon slot so text below can indent by the exact same amount */
-        .mega-col-icon {
-            width: 22px; height: 22px; flex-shrink: 0;
-            display: inline-flex; align-items: center; justify-content: center;
-        }
-        .mega-col-icon img { width: 22px; height: 22px; object-fit: contain; }
-        .mega-col-icon i { font-size: 1rem; line-height: 1; }
+/* ---- Mega menu ----
+   Positioned against the <nav class="navbar"> (not the <ul>), so
+   keep position:relative off the <ul>. */
+.mega-menu {
+    position: absolute; left: 0; right: 0; top: 100%;
+    background: #fff; border-top: 3px solid var(--brand-red);
+    border-radius: 0 0 16px 16px;
+    box-shadow: 0 24px 48px -12px rgba(16,24,40,.18);
+    padding: 1.25rem 0 1.5rem; z-index: 1030;
+    opacity: 0; visibility: hidden; transform: translateY(12px); pointer-events: none;
+    transition: opacity .22s ease, transform .22s ease, visibility 0s linear .22s;
+}
+.mega-menu.show {
+    opacity: 1; visibility: visible; transform: none; pointer-events: auto;
+    transition-delay: 0s;
+}
 
-        /* Column wrapper: prevent flex/grid children from ignoring
-           min-content and forcing overlap when text is long (e.g.
-           "Western Digital", "Keyboards & Mice") */
-        .mega-col { min-width: 0; }
-        .mega-col-title span:last-child {
-            overflow-wrap: break-word;
-            min-width: 0;
-        }
+/* Each column = a soft card that wakes up on hover */
+.mega-col {
+    position: relative; isolation: isolate; min-width: 0;
+    padding: .9rem calc(var(--bs-gutter-x) * .5 + .9rem);
+}
+.mega-col::before {            /* card background */
+    content: ""; position: absolute; z-index: -1;
+    inset: 0 calc(var(--bs-gutter-x) * .5);
+    border-radius: 12px; border: 1px solid transparent; background: transparent;
+    transition: background .2s ease, border-color .2s ease, box-shadow .2s ease;
+}
+.mega-col::after {             /* red bar that grows across the top */
+    content: ""; position: absolute; top: 0;
+    left: calc(var(--bs-gutter-x) * .5 + 14px); right: calc(var(--bs-gutter-x) * .5 + 14px);
+    height: 3px; border-radius: 0 0 3px 3px; background: var(--brand-red);
+    transform: scaleX(0); transition: transform .3s ease;
+}
+.mega-col:hover::before { background: #fafbfc; border-color: #eceef1; box-shadow: 0 10px 24px -12px rgba(16,24,40,.18); }
+.mega-col:hover::after  { transform: scaleX(1); }
 
-        /* Sub-links: indented to line up under the title text, not the icon */
-        .mega-col a {
-            display: block; font-size: .85rem; color: var(--muted);
-            text-decoration: none;
-            padding: .2rem 0 .2rem 30px; /* 22px icon + .5rem (8px) gap = 30px */
-        }
-        .mega-col a:hover { color: var(--brand-red); }
+/* Column title: icon bubble + label */
+.mega-col-title {
+    font-weight: 700; font-size: .95rem; color: var(--ink);
+    margin-bottom: .5rem; display: flex; align-items: center; gap: .5rem;
+    transition: color .2s ease;
+}
+.mega-col-title span:last-child { overflow-wrap: break-word; min-width: 0; }
+.mega-col-icon {
+    width: 32px; height: 32px; flex-shrink: 0; border-radius: 10px;
+    background: var(--brand-red-light);
+    display: inline-flex; align-items: center; justify-content: center;
+    transition: background .2s ease, transform .25s ease;
+}
+.mega-col-icon img { width: 20px; height: 20px; object-fit: contain; transition: filter .2s ease; }
+.mega-col-icon i { font-size: 1rem; line-height: 1; transition: color .2s ease; }
+.mega-col:hover .mega-col-title { color: var(--brand-red); }
+.mega-col:hover .mega-col-icon  { background: var(--brand-red); transform: rotate(-6deg) scale(1.08); }
+.mega-col:hover .mega-col-icon img { filter: brightness(0) invert(1); }
+.mega-col:hover .mega-col-icon i   { color: #fff !important; }
+
+/* Links: indented under the title text (32px icon + 8px gap = 40px) */
+.mega-col a {
+    position: relative; display: block; font-size: .86rem; color: var(--ink);
+    text-decoration: none; padding: .3rem .5rem .3rem 40px; border-radius: 6px;
+    transition: color .15s ease, background .15s ease, padding-left .2s ease;
+}
+.mega-col a:hover::before { width: 10px; }
+.mega-col a:hover { color: var(--brand-red); background: var(--brand-red-light); padding-left: 46px; }
+.mega-col a:hover::before { width: 10px; }
+
+.mega-col a.mega-all { color: var(--brand-red); font-weight: 600; margin-bottom: .15rem; }
+.mega-col a.mega-all::after {
+    content: "\2192"; margin-left: .4rem; display: inline-block; transition: transform .2s ease;
+}
+.mega-col a.mega-all:hover::after { transform: translateX(5px); }
+
+/* Columns fade up one after another when the menu opens */
+@keyframes megaColIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+.mega-menu.show .mega-col { animation: megaColIn .35s ease both; }
+.mega-menu.show .mega-col:nth-child(2) { animation-delay: .04s; }
+.mega-menu.show .mega-col:nth-child(3) { animation-delay: .08s; }
+.mega-menu.show .mega-col:nth-child(4) { animation-delay: .12s; }
+.mega-menu.show .mega-col:nth-child(5) { animation-delay: .16s; }
+.mega-menu.show .mega-col:nth-child(6) { animation-delay: .20s; }
+.mega-menu.show .mega-col:nth-child(7) { animation-delay: .24s; }
+.mega-menu.show .mega-col:nth-child(8) { animation-delay: .28s; }
+
+@media (prefers-reduced-motion: reduce) {
+    .mega-menu, .mega-col, .mega-col *, .main-nav .nav-link::after { transition: none !important; animation: none !important; }
+}
 
         /* ---- Category strip ---- */
         .category-chip { text-decoration: none; text-align: center; display: block; }
@@ -127,7 +179,11 @@
         .whatsapp-float:hover { color: #fff; opacity: .9; }
         @media (max-width: 767px) {
             .whatsapp-float { left: 12px; right: 12px; text-align: center; bottom: 12px; border-radius: 8px; }
-            .mega-menu { position: static; box-shadow: none; }
+            .mega-menu {
+                position: static; box-shadow: none; border-radius: 0; padding: .75rem 0;
+                display: none; opacity: 1; visibility: visible; transform: none; pointer-events: auto; transition: none;
+            }
+            .mega-menu.show { display: block; }
         }
 
         footer.site-footer { background: #16181A; color: #b8bcc2; }
@@ -262,9 +318,9 @@
                                             </span>
                                             <span>{{ $cat->name }}</span>
                                         </div>
-                                        <a href="{{ route('categories.show', $cat) }}" class="fw-semibold" style="color:var(--ink)">View All</a>
+                                        <a href="{{ route('categories.show', $cat) }}" class="mega-all">View All</a>
                                         @foreach($cat->menuBrands as $mb)
-                                            <a href="{{ route('brands.show', $mb) }}">{{ $mb->name }}</a>
+                                            <a href="{{ route('products.index', ['category' => $cat->slug, 'brand' => $mb->slug]) }}">{{ $mb->name }}</a>
                                         @endforeach
                                     </div>
                                 @endforeach
@@ -338,16 +394,29 @@
     const megaToggle = document.getElementById('productsMegaToggle');
     let hideTimer;
 
-    function showMega() { clearTimeout(hideTimer); megaMenu.classList.add('show'); }
-    function hideMegaDelayed() { hideTimer = setTimeout(() => megaMenu.classList.remove('show'), 150); }
+   function showMega() {
+        clearTimeout(hideTimer);
+        megaMenu.classList.add('show');
+        megaToggle.classList.add('show');
+    }
+    function hideMegaDelayed() {
+        hideTimer = setTimeout(() => {
+            megaMenu.classList.remove('show');
+            megaToggle.classList.remove('show');
+        }, 150);
+    }
 
     if (window.innerWidth > 991) {
         megaWrap.addEventListener('mouseenter', showMega);
         megaWrap.addEventListener('mouseleave', hideMegaDelayed);
+        megaWrap.addEventListener('focusin', showMega);      // keyboard: Tab into the menu
+        megaWrap.addEventListener('focusout', hideMegaDelayed);
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') hideMegaDelayed(); });
     } else {
         megaToggle.addEventListener('click', function (e) {
             e.preventDefault();
             megaMenu.classList.toggle('show');
+            megaToggle.classList.toggle('show');
         });
     }
 </script>

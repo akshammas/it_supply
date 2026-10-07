@@ -29,7 +29,7 @@ class HomeController extends Controller
                     ->get(),
                 'featuredBrands' => Brand::where('status', true)
                     ->orderBy('sort_order')
-                    ->take(10)
+                    ->orderBy('name')
                     ->get(),
                 'featuredProducts' => Product::with(['brand', 'primaryImage'])
                     ->where('status', true)

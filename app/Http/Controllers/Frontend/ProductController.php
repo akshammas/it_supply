@@ -19,7 +19,10 @@ class ProductController extends Controller
             'products' => $products,
             'brands' => Brand::where('status', true)->orderBy('name')->get(),
             'categories' => Category::where('status', true)->orderBy('name')->get(),
-            'heading' => 'All Products',
+            'heading' => collect([
+                $request->filled('category') ? optional(Category::where('slug', $request->string('category'))->first())->name : null,
+                $request->filled('brand') ? optional(Brand::where('slug', $request->string('brand'))->first())->name : null,
+            ])->filter()->implode(' – ') ?: 'All Products',
         ]);
     }
 
