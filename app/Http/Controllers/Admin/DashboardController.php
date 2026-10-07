@@ -33,6 +33,21 @@ class DashboardController extends Controller
             ->take(8)
             ->get();
 
-        return view('admin.dashboard', compact('stats', 'recentEnquiries', 'recentActivity'));
+        // Enquiries per day for the last 7 days (today included)
+        $perDay = Enquiry::where('created_at', '>=', now()->subDays(6)->startOfDay())
+            ->selectRaw('DATE(created_at) as d, COUNT(*) as c')
+            ->groupBy('d')
+            ->pluck('c', 'd');
+
+        $chart = collect(range(6, 0))->map(function ($i) use ($perDay) {
+            $date = now()->subDays($i);
+            return [
+                'label' => $date->format('D'),
+                'date'  => $date->format('d M'),
+                'count' => (int) ($perDay[$date->toDateString()] ?? 0),
+            ];
+        });
+
+        return view('admin.dashboard', compact('stats', 'recentEnquiries', 'recentActivity', 'chart'));
     }
 }

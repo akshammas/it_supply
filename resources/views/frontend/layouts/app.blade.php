@@ -217,6 +217,19 @@
                 object-fit: cover;
             }
         }
+
+
+        /* ---- Pagination ---- */
+.pagination { gap: 4px; flex-wrap: wrap; }
+.pagination .page-link {
+    color: var(--ink); border: 1px solid #e3e6ea; border-radius: 10px !important;
+    min-width: 38px; text-align: center; font-weight: 600; font-size: .88rem;
+}
+.pagination .page-link:hover { background: var(--brand-red-light); border-color: #ffd3da; color: var(--brand-red); }
+.pagination .page-link:focus { box-shadow: 0 0 0 .2rem rgba(228,0,43,.12); }
+.pagination .page-item.active .page-link { background: var(--brand-red); border-color: var(--brand-red); color: #fff; }
+.pagination .page-item.disabled .page-link { background: #f5f6f8; color: #aab0b8; }
+
         /* ===== Hero carousel animation ===== */
 #heroCarousel .hero-bg {
     position: absolute;
