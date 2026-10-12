@@ -17,6 +17,7 @@ use App\Http\Controllers\Admin\SolutionController;
 use App\Http\Controllers\Admin\SpecificationController;
 use App\Http\Controllers\Admin\SpecificationGroupController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\FaqController;
 
 /*
 |--------------------------------------------------------------------------
@@ -88,6 +89,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         Route::resource('pages', PageController::class)->except('show');
         Route::resource('banners', BannerController::class)->except('show');
+        Route::resource('faqs', FaqController::class)->except('show');
 
         Route::get('settings', [SettingController::class, 'edit'])->name('settings.edit');
         Route::put('settings', [SettingController::class, 'update'])->name('settings.update');

@@ -35,6 +35,7 @@
                 ['Blog', 'bi-journal-text', 'admin.blog.index', ['admin.blog.*', 'admin.blog-categories.*']],
                 ['Pages', 'bi-file-earmark', 'admin.pages.index', ['admin.pages.*']],
                 ['Banners', 'bi-images', 'admin.banners.index', ['admin.banners.*']],
+                ['FAQs', 'bi-question-circle', 'admin.faqs.index', ['admin.faqs.*']],
             ],
             'System' => [
                 ['Admin Users', 'bi-person-badge', null, [], null, true],

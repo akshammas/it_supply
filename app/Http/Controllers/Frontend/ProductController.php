@@ -8,6 +8,7 @@ use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use App\Models\Faq;
 
 class ProductController extends Controller
 {
@@ -44,7 +45,9 @@ class ProductController extends Controller
         $specGroups = $product->specifications
             ->groupBy(fn ($ps) => $ps->specification->group->name ?? 'Specifications');
 
-        return view('frontend.products.show', compact('product', 'related', 'specGroups'));
+        $faqs = Faq::forProduct($product)->get();
+
+        return view('frontend.products.show', compact('product', 'related', 'specGroups', 'faqs'));
     }
 
     /**
