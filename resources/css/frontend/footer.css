@@ -1,0 +1,18 @@
+footer.site-footer {
+    background: #16181A;
+    color: #b8bcc2;
+}
+
+footer.site-footer h5,
+footer.site-footer h6 {
+    color: #fff;
+}
+
+footer.site-footer a {
+    color: #b8bcc2;
+    text-decoration: none;
+}
+
+footer.site-footer a:hover {
+    color: var(--brand-red);
+}

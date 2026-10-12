@@ -1,0 +1,8 @@
+@import './tokens.css';
+@import './frontend/base.css';
+@import './frontend/header.css';
+@import './frontend/home.css';
+@import './frontend/blog.css';
+@import './frontend/contact.css';
+@import './frontend/whatsapp.css';
+@import './frontend/footer.css';

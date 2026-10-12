@@ -1,0 +1,131 @@
+body {
+    font-family: 'Inter', sans-serif;
+    color: var(--ink);
+}
+
+/* ---- Section headers ---- */
+.section-eyebrow {
+    color: var(--brand-red);
+    font-weight: 700;
+    font-size: .8rem;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+}
+
+.section-title {
+    font-weight: 800;
+    font-size: 1.6rem;
+}
+
+/* ---- CTA band ---- */
+.cta-band {
+    background: linear-gradient(120deg, var(--brand-red), var(--brand-red-dark));
+    color: #fff;
+}
+
+
+/* ---- Global Bootstrap color overrides ----
+           Every other frontend page (listing, product detail, category,
+           brand, contact, enquiry, quote-request) extends this same
+           layout but still uses plain Bootstrap classes like btn-primary.
+           Overriding them here, once, makes the red theme apply
+           site-wide instead of needing every individual page restyled. */
+.btn-primary,
+.badge.bg-primary,
+.bg-primary {
+    background-color: var(--brand-red) !important;
+    border-color: var(--brand-red) !important;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+    background-color: var(--brand-red-dark) !important;
+    border-color: var(--brand-red-dark) !important;
+}
+
+.btn-outline-primary {
+    color: var(--brand-red) !important;
+    border-color: var(--brand-red) !important;
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--brand-red) !important;
+    color: #fff !important;
+}
+
+.text-primary {
+    color: var(--brand-red) !important;
+}
+
+.border-primary {
+    border-color: var(--brand-red) !important;
+}
+
+main a:not(.btn):not(.dropdown-item):not(.nav-link) {
+    color: var(--brand-red);
+}
+
+.page-link {
+    color: var(--brand-red);
+}
+
+.page-item.active .page-link {
+    background-color: var(--brand-red);
+    border-color: var(--brand-red);
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--brand-red);
+    box-shadow: 0 0 0 .25rem rgba(228, 0, 43, .15);
+}
+
+/* WhatsApp buttons deliberately stay green (btn-success) — the
+           contrast against the red theme is intentional, same pattern
+           the reference site uses. */
+
+@media (min-width: 992px) {
+    .promo-single .promo-img {
+        max-height: 200px;
+        /* change this number to taste */
+        object-fit: cover;
+    }
+}
+
+
+/* ---- Pagination ---- */
+.pagination {
+    gap: 4px;
+    flex-wrap: wrap;
+}
+
+.pagination .page-link {
+    color: var(--ink);
+    border: 1px solid #e3e6ea;
+    border-radius: 10px !important;
+    min-width: 38px;
+    text-align: center;
+    font-weight: 600;
+    font-size: .88rem;
+}
+
+.pagination .page-link:hover {
+    background: var(--brand-red-light);
+    border-color: #ffd3da;
+    color: var(--brand-red);
+}
+
+.pagination .page-link:focus {
+    box-shadow: 0 0 0 .2rem rgba(228, 0, 43, .12);
+}
+
+.pagination .page-item.active .page-link {
+    background: var(--brand-red);
+    border-color: var(--brand-red);
+    color: #fff;
+}
+
+.pagination .page-item.disabled .page-link {
+    background: #f5f6f8;
+    color: #aab0b8;
+}

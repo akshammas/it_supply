@@ -1,0 +1,162 @@
+/* ---- Category strip ---- */
+.category-chip {
+    text-decoration: none;
+    text-align: center;
+    display: block;
+}
+
+.category-chip .chip-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: var(--brand-red-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto .5rem;
+    border: 1px solid #ffe0e5;
+    transition: .15s;
+}
+
+.category-chip:hover .chip-icon {
+    background: var(--brand-red);
+}
+
+.category-chip:hover .chip-icon i,
+.category-chip:hover .chip-icon img {
+    filter: brightness(0) invert(1);
+}
+
+.category-chip .chip-label {
+    font-size: .8rem;
+    font-weight: 600;
+    color: var(--ink);
+}
+
+.scroll-row {
+    display: flex;
+    gap: 1.25rem;
+    overflow-x: auto;
+    padding-bottom: .5rem;
+    scrollbar-width: thin;
+}
+
+.scroll-row::-webkit-scrollbar {
+    height: 6px;
+}
+
+.scroll-row::-webkit-scrollbar-thumb {
+    background: #ddd;
+    border-radius: 3px;
+}
+
+.scroll-row>* {
+    flex: 0 0 auto;
+}
+
+/* ---- Brand strip ---- */
+.brand-tile {
+    width: 130px;
+    height: 80px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: .75rem;
+    transition: .15s;
+}
+
+.brand-tile:hover {
+    border-color: var(--brand-red);
+    box-shadow: 0 4px 12px rgba(228, 0, 43, .1);
+}
+
+.brand-tile img {
+    max-height: 60px;
+    max-width: 100%;
+    object-fit: contain;
+}
+
+
+/* ===== Hero carousel animation ===== */
+#heroCarousel .hero-bg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    will-change: transform;
+}
+
+/* Slower cross-fade (Bootstrap's default is 0.6s) */
+#heroCarousel.carousel-fade .carousel-item {
+    transition-duration: 1s;
+}
+
+#heroCarousel.carousel-fade .active.carousel-item-start,
+#heroCarousel.carousel-fade .active.carousel-item-end {
+    transition: opacity 0s 1s;
+    /* keep this delay equal to the duration above */
+}
+
+/* Slow zoom + text entrance, starting as the next slide begins to fade in */
+#heroCarousel .carousel-item:is(.active, .carousel-item-next, .carousel-item-prev) .hero-bg {
+    animation: heroZoom 9s ease-out both;
+}
+
+#heroCarousel .carousel-item:is(.active, .carousel-item-next, .carousel-item-prev) .hero-anim {
+    animation: heroFadeUp .9s cubic-bezier(.22, .61, .36, 1) both;
+}
+
+#heroCarousel .carousel-item:is(.active, .carousel-item-next, .carousel-item-prev) .hero-anim:nth-child(1) {
+    animation-delay: .25s;
+}
+
+#heroCarousel .carousel-item:is(.active, .carousel-item-next, .carousel-item-prev) .hero-anim:nth-child(2) {
+    animation-delay: .45s;
+}
+
+#heroCarousel .carousel-item:is(.active, .carousel-item-next, .carousel-item-prev) .hero-anim:nth-child(3) {
+    animation-delay: .65s;
+}
+
+@keyframes heroZoom {
+    from {
+        transform: scale(1);
+    }
+
+    to {
+        transform: scale(1.08);
+    }
+}
+
+@keyframes heroFadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(24px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Smooth button hover */
+#heroCarousel .btn {
+    transition: transform .2s ease, box-shadow .2s ease, background-color .2s ease, color .2s ease;
+}
+
+#heroCarousel .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, .25);
+}
+
+/* Respect visitors who turn animations off in their system settings */
+@media (prefers-reduced-motion: reduce) {
+
+    #heroCarousel .hero-bg,
+    #heroCarousel .hero-anim {
+        animation: none !important;
+    }
+}
