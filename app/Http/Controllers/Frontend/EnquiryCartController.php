@@ -30,7 +30,7 @@ class EnquiryCartController extends Controller
         $quantity = (int) $request->input('quantity', 1);
         $this->cart->add($product->id, $quantity);
 
-        if ($request->boolean('redirect_to_quote')) {
+        if ($request->boolean('redirect_to_quote') && array_key_exists($product->id, session('enquiry_cart', []))) {
             return redirect()->route('quote-request.create');
         }
 

@@ -20,7 +20,7 @@ class NewEnquiryReceived extends Mailable
         $from = $this->enquiry->company_name ?: $this->enquiry->name;
 
         return $this
-            ->subject("New Enquiry #{$this->enquiry->id} — {$from}")
+            ->subject("New Enquiry #{$this->enquiry->id} — {$from}" . ($this->enquiry->subject ? ": {$this->enquiry->subject}" : ''))
             ->view('emails.new-enquiry');
     }
 }

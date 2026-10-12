@@ -27,7 +27,9 @@ class QuoteRequestController extends Controller
         }
 
         return view('frontend.quote-request.create', [
-            'items' => $this->cart->items(),
+            'items'          => $this->cart->items(),
+            'defaultSubject' => $this->cart->quoteSubject(),
+            'defaultMessage' => $this->cart->quoteMessage(),
         ]);
     }
 

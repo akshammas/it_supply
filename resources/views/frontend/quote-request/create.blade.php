@@ -29,12 +29,12 @@
                     </div>
                     <div class="col-12">
                         <label class="form-label">Subject *</label>
-                        <input type="text" name="subject" value="{{ old('subject') }}" class="form-control"
-                            placeholder="e.g. Quote for 10 Lenovo monitors" required>
+                        <input type="text" name="subject" value="{{ old('subject', $defaultSubject) }}" class="form-control"
+                              placeholder="e.g. Quote for 10 Lenovo monitors" required>
                     </div>
                     <div class="col-12">
                         <label class="form-label">Message</label>
-                        <textarea name="message" rows="4" class="form-control" placeholder="Any additional details...">{{ old('message') }}</textarea>
+                        <textarea name="message" rows="6" class="form-control" placeholder="Any additional details...">{{ old('message', $defaultMessage) }}</textarea>
                     </div>
                 </div>
             </div>

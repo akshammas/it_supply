@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Product;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Str;
 
 /**
  * Section 16: a session-based "Enquiry Cart" — deliberately NOT written to
@@ -96,6 +97,44 @@ class EnquiryCartService
 
         return implode("\n", $lines);
     }
+
+    /**
+     * Default subject for the quote form, e.g.
+     * "Quote request: Lenovo 27-inch QHD Business Monitor"
+     * or "Quote request: Lenovo 27-inch… + 2 more" for several products.
+     */
+    public function quoteSubject(): string
+    {
+        $items = $this->items();
+
+        if ($items->isEmpty()) {
+            return 'Quote request';
+        }
+
+        $first = Str::limit($items->first()['product']->name, 100, '…');
+
+        return $items->count() === 1
+            ? "Quote request: {$first}"
+            : "Quote request: {$first} + " . ($items->count() - 1) . ' more';
+    }
+
+    /**
+     * Pre-written message listing the product(s) the customer picked.
+     */
+    public function quoteMessage(): string
+    {
+        $lines = ["Hello,\n\nI would like to request a quote for the following:\n"];
+
+        foreach ($this->items() as $item) {
+            $sku = $item['product']->sku ? " (SKU: {$item['product']->sku})" : '';
+            $lines[] = "- {$item['product']->name}{$sku} x{$item['quantity']}";
+        }
+
+        $lines[] = "\nPlease share your best price and availability.\n\nThank you.";
+
+        return implode("\n", $lines);
+    }
+
 
     protected function raw(): array
     {
