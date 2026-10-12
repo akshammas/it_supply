@@ -130,18 +130,3 @@ main a:not(.btn):not(.dropdown-item):not(.nav-link) {
     color: #aab0b8;
 }
 
-/* ---- FAQ accordion ---- */
-.faq-accordion {
-    --bs-accordion-border-width: 0;
-    --bs-accordion-bg: transparent;
-    --bs-accordion-active-bg: var(--brand-red-light);
-    --bs-accordion-active-color: var(--brand-red);
-    --bs-accordion-btn-focus-box-shadow: 0 0 0 .2rem rgba(228,0,43,.15);
-    --bs-accordion-btn-active-icon: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23E4002B'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
-}
-.faq-accordion .accordion-item {
-    border: 1px solid #eceef1; border-radius: 12px; margin-bottom: .75rem; overflow: hidden; background: #fff;
-}
-.faq-accordion .accordion-button { font-weight: 600; padding: 1rem 1.25rem; }
-.faq-accordion .accordion-button:not(.collapsed) { box-shadow: none; }
-.faq-accordion .accordion-body { color: #4b5563; line-height: 1.7; padding: 1rem 1.25rem 1.25rem; }

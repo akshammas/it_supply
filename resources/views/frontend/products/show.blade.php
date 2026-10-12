@@ -3,207 +3,321 @@
 @section('meta_description', $product->meta_description ?? Str::limit(strip_tags($product->short_description), 150))
 
 @section('content')
-<div class="container py-4">
+@php
+    $faqs = $faqs ?? collect();
+
+    $price   = $product->sale_price ?? $product->price;
+    $onSale  = $product->price_type === 'sale' && $product->sale_price && $product->price > 0;
+    $discount = $onSale ? (int) round((1 - $product->sale_price / $product->price) * 100) : null;
+
+    [$stockLabel, $stockTone] = match ($product->stock_status) {
+        'in_stock' => ['In stock', 'ok'],
+        'preorder' => ['Pre-order', 'warn'],
+        default    => ['Out of stock', 'bad'],
+    };
+
+    $waNumber = preg_replace('/\D+/', '', \App\Models\Setting::get('whatsapp_number', '971500000000'));
+    $waLink   = 'https://wa.me/'.$waNumber.'?text='.urlencode($product->whatsappMessage());
+    $phone    = \App\Models\Setting::get('phone');
+
+    $hasOverview = filled($product->description);
+    $hasSpecs    = $specGroups->isNotEmpty();
+@endphp
+
+<div class="container py-4 pd-page">
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb small">
             <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
             @if($product->category)
                 <li class="breadcrumb-item"><a href="{{ route('categories.show', $product->category) }}">{{ $product->category->name }}</a></li>
             @endif
-            <li class="breadcrumb-item active">{{ $product->name }}</li>
+            <li class="breadcrumb-item active" aria-current="page">{{ $product->name }}</li>
         </ol>
     </nav>
 
-    <div class="row">
-        {{-- IMAGE GALLERY --}}
-        <div class="col-lg-5 mb-4">
-            @if($product->images->isNotEmpty())
-                <div id="productGallery" class="carousel slide border rounded mb-2" data-bs-ride="false">
-                    <div class="carousel-inner">
-                        @foreach($product->images as $image)
-                            <div class="carousel-item {{ $loop->first ? 'active' : '' }}">
-                                <img src="{{ Storage::url($image->image) }}" class="d-block w-100" style="height:360px; object-fit:contain;" alt="{{ $product->name }}">
-                            </div>
-                        @endforeach
+    {{-- Hidden forms so buttons anywhere on the page can submit them --}}
+    <form id="addForm" method="POST" action="{{ route('enquiry.add', $product) }}" class="d-none">@csrf</form>
+    <form id="quickAddForm" method="POST" action="{{ route('enquiry.add', $product) }}" class="d-none">
+        @csrf
+        <input type="hidden" name="quantity" value="1" id="quickQty">
+        <input type="hidden" name="redirect_to_quote" value="1">
+    </form>
+
+    <div class="row g-4 g-xl-5">
+        {{-- ================= GALLERY ================= --}}
+        <div class="col-lg-6">
+            <div class="pd-gallery">
+                @if($product->images->isNotEmpty())
+                    <div id="productGallery" class="carousel slide pd-stage" data-bs-ride="false">
+                        @if($discount)<span class="pd-badge">-{{ $discount }}%</span>@endif
+
+                        <div class="carousel-inner">
+                            @foreach($product->images as $image)
+                                <div class="carousel-item {{ $loop->first ? 'active' : '' }}">
+                                    <img src="{{ Storage::url($image->image) }}" class="pd-main-img"
+                                         alt="{{ $image->alt_text ?: $product->name }}">
+                                </div>
+                            @endforeach
+                        </div>
+
+                        @if($product->images->count() > 1)
+                            <button class="pd-arrow pd-arrow-prev" type="button" data-bs-target="#productGallery" data-bs-slide="prev" aria-label="Previous image">
+                                <i class="bi bi-chevron-left"></i>
+                            </button>
+                            <button class="pd-arrow pd-arrow-next" type="button" data-bs-target="#productGallery" data-bs-slide="next" aria-label="Next image">
+                                <i class="bi bi-chevron-right"></i>
+                            </button>
+                        @endif
                     </div>
+
                     @if($product->images->count() > 1)
-                        <button class="carousel-control-prev" type="button" data-bs-target="#productGallery" data-bs-slide="prev">
-                            <span class="carousel-control-prev-icon"></span>
-                        </button>
-                        <button class="carousel-control-next" type="button" data-bs-target="#productGallery" data-bs-slide="next">
-                            <span class="carousel-control-next-icon"></span>
-                        </button>
+                        <div class="pd-thumbs">
+                            @foreach($product->images as $image)
+                                <button type="button" class="pd-thumb {{ $loop->first ? 'active' : '' }}"
+                                        data-bs-target="#productGallery" data-bs-slide-to="{{ $loop->index }}"
+                                        aria-label="Show image {{ $loop->iteration }}">
+                                    <img src="{{ Storage::url($image->image) }}" alt="">
+                                </button>
+                            @endforeach
+                        </div>
                     @endif
-                </div>
-                <div class="d-flex gap-2 flex-wrap">
-                    @foreach($product->images as $image)
-                        <img src="{{ Storage::url($image->image) }}" class="border rounded" style="width:60px; height:60px; object-fit:contain; cursor:pointer;"
-                             onclick="var c = bootstrap.Carousel.getOrCreateInstance(document.getElementById('productGallery')); c.to({{ $loop->index }})">
-                    @endforeach
-                </div>
-            @else
-                <div class="border rounded bg-light d-flex align-items-center justify-content-center" style="height:360px;">
-                    <i class="bi bi-image text-muted fs-1"></i>
-                </div>
-            @endif
+                @else
+                    <div class="pd-stage pd-stage-empty"><i class="bi bi-image"></i></div>
+                @endif
+            </div>
         </div>
 
-        {{-- SUMMARY / ACTIONS --}}
-        <div class="col-lg-7">
-            @if($product->brand)
-                <a href="{{ route('brands.show', $product->brand) }}" class="text-decoration-none text-muted small text-uppercase">{{ $product->brand->name }}</a>
-            @endif
-            <h1 class="h3">{{ $product->name }}</h1>
-            <div class="text-muted small mb-3">@if($product->sku) SKU: {{ $product->sku }} @endif @if($product->model_number) &middot; Model: {{ $product->model_number }} @endif</div>
+        {{-- ================= INFO ================= --}}
+        <div class="col-lg-6">
+            <div class="d-flex align-items-center flex-wrap gap-2">
+                @if($product->brand)
+                    <a href="{{ route('brands.show', $product->brand) }}" class="pd-brand">{{ $product->brand->name }}</a>
+                @endif
+                <span class="pd-stock pd-stock-{{ $stockTone }}"><span class="dot"></span>{{ $stockLabel }}</span>
+            </div>
 
-            <div class="mb-3">
-                @if($product->price_type === 'on_request')
-                    <span class="fs-4 text-muted">Price on Request</span>
+            <h1 class="pd-title">{{ $product->name }}</h1>
+
+            <div class="pd-meta">
+                @if($product->sku)<span class="pd-chip">SKU <b>{{ $product->sku }}</b></span>@endif
+                @if($product->model_number)<span class="pd-chip">Model <b>{{ $product->model_number }}</b></span>@endif
+                @if($product->condition)<span class="pd-chip">Condition <b>{{ ucfirst($product->condition) }}</b></span>@endif
+            </div>
+
+            <div class="pd-price-box">
+                @if($product->price_type === 'on_request' || $price === null)
+                    <div class="pd-label mb-1">Price</div>
+                    <div class="pd-price-request">Price on request</div>
+                    <div class="small text-muted mt-1">Send a quote request and we will reply with the best price.</div>
                 @else
-                    <span class="fs-4 fw-bold">AED {{ number_format($product->sale_price ?? $product->price, 2) }}</span>
-                    @if($product->price_type === 'sale' && $product->sale_price)
-                        <del class="text-muted ms-2">AED {{ number_format($product->price, 2) }}</del>
-                    @endif
+                    <div class="pd-label mb-1">{{ $onSale ? 'Sale price' : 'Price' }}</div>
+                    <div>
+                        <span class="pd-price"><small>AED</small>{{ number_format($price, 2) }}</span>
+                        @if($onSale)
+                            <span class="pd-price-old">AED {{ number_format($product->price, 2) }}</span>
+                            <span class="pd-save">Save {{ $discount }}%</span>
+                        @endif
+                    </div>
                 @endif
             </div>
 
-            <div class="mb-3 {{ $product->stock_status === 'in_stock' ? 'text-success' : 'text-danger' }}">
-                <i class="bi bi-check-circle-fill"></i> {{ str_replace('_', ' ', ucfirst($product->stock_status)) }}
-            </div>
-
             @if($product->short_description)
-                <p>{{ $product->short_description }}</p>
+                <p class="pd-lead">{{ $product->short_description }}</p>
             @endif
 
-            <div class="d-flex flex-wrap gap-2 mb-4">
-                <a href="https://wa.me/{{ \App\Models\Setting::get('whatsapp_number', '971500000000') }}?text={{ urlencode($product->whatsappMessage()) }}"
-                   target="_blank" class="btn btn-success">
-                    <i class="bi bi-whatsapp me-1"></i> WhatsApp Enquiry
-                </a>
-                <a href="{{ route('quote-request.create') }}" class="btn btn-primary" onclick="document.getElementById('quickAddForm').submit(); return false;">
-                    <i class="bi bi-file-earmark-text me-1"></i> Request Quote
-                </a>
-                <form method="POST" action="{{ route('enquiry.add', $product) }}" class="d-inline-flex align-items-center gap-2">
-                    @csrf
-                    <input type="number" name="quantity" value="1" min="1" class="form-control form-control-sm" style="width:70px">
-                    <button type="submit" class="btn btn-outline-primary">
-                        <i class="bi bi-cart-plus me-1"></i> Add to Enquiry
+            <div class="pd-actions">
+                <div class="pd-buy">
+                    <div class="pd-qty">
+                        <button type="button" data-qty="-1" aria-label="Decrease quantity"><i class="bi bi-dash"></i></button>
+                        <input type="number" name="quantity" id="pdQty" value="1" min="1" form="addForm" aria-label="Quantity">
+                        <button type="button" data-qty="1" aria-label="Increase quantity"><i class="bi bi-plus"></i></button>
+                    </div>
+                    <button type="submit" form="quickAddForm" class="btn btn-primary pd-quote">
+                        <i class="bi bi-file-earmark-text me-2"></i>Request Quote
                     </button>
-                </form>
-                <form id="quickAddForm" method="POST" action="{{ route('enquiry.add', $product) }}" class="d-none">
-                    @csrf
-                    <input type="hidden" name="quantity" value="1">
-                    <input type="hidden" name="redirect_to_quote" value="1">
-                </form>
+                </div>
+
+                <div class="pd-secondary">
+                    <a href="{{ $waLink }}" target="_blank" rel="noopener" class="btn btn-success">
+                        <i class="bi bi-whatsapp me-2"></i>WhatsApp Enquiry
+                    </a>
+                    <button type="submit" form="addForm" class="btn btn-outline-primary">
+                        <i class="bi bi-cart-plus me-2"></i>Add to Enquiry
+                    </button>
+                </div>
             </div>
 
             @if($product->variants->isNotEmpty())
-                <div class="card mb-4">
-                    <div class="card-header bg-white fw-semibold">Available Configurations</div>
-                    <ul class="list-group list-group-flush">
-                        @foreach($product->variants as $variant)
-                            <li class="list-group-item d-flex justify-content-between">
-                                <span>{{ $variant->name }}</span>
-                                <span class="fw-semibold">
-                                    @if($variant->sale_price ?? $variant->price)
-                                        AED {{ number_format($variant->sale_price ?? $variant->price, 2) }}
-                                    @else
-                                        On Request
-                                    @endif
-                                </span>
-                            </li>
-                        @endforeach
-                    </ul>
+                <div class="pd-label">Available configurations</div>
+                <div class="pd-variants">
+                    @foreach($product->variants as $variant)
+                        <div class="pd-variant">
+                            <span>{{ $variant->name }}</span>
+                            <strong>
+                                @if($variant->sale_price ?? $variant->price)
+                                    AED {{ number_format($variant->sale_price ?? $variant->price, 2) }}
+                                @else
+                                    On request
+                                @endif
+                            </strong>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+
+            @if($phone)
+                <div class="pd-help">
+                    Need help choosing? Call <a href="tel:{{ preg_replace('/[^\d+]/', '', $phone) }}">{{ $phone }}</a>
                 </div>
             @endif
         </div>
     </div>
 
-    {{-- OVERVIEW / DESCRIPTION --}}
-    @if($product->description)
-    <div class="row mt-4">
-        <div class="col-lg-9">
-            <h4>Overview</h4>
-            <div>{!! nl2br(e($product->description)) !!}</div>
-        </div>
-    </div>
+    {{-- ================= OVERVIEW / SPECIFICATIONS ================= --}}
+    @if($hasOverview || $hasSpecs)
+        <section class="pd-section">
+            <div class="pd-card">
+                <ul class="nav pd-tabs" role="tablist">
+                    @if($hasOverview)
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" type="button" role="tab" data-bs-toggle="tab" data-bs-target="#pdOverview">Overview</button>
+                        </li>
+                    @endif
+                    @if($hasSpecs)
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link {{ $hasOverview ? '' : 'active' }}" type="button" role="tab" data-bs-toggle="tab" data-bs-target="#pdSpecs">Specifications</button>
+                        </li>
+                    @endif
+                </ul>
+
+                <div class="tab-content">
+                    @if($hasOverview)
+                        <div class="tab-pane fade show active pd-pane" id="pdOverview" role="tabpanel">
+                            <div class="pd-content">{!! nl2br(e($product->description)) !!}</div>
+                        </div>
+                    @endif
+
+                    @if($hasSpecs)
+                        <div class="tab-pane fade {{ $hasOverview ? '' : 'show active' }} pd-pane" id="pdSpecs" role="tabpanel">
+                            @foreach($specGroups as $groupName => $specs)
+                                <div class="pd-spec-group">
+                                    <h6 class="pd-spec-title">{{ $groupName }}</h6>
+                                    <dl class="pd-specs">
+                                        @foreach($specs as $ps)
+                                            <div class="pd-spec-row">
+                                                <dt>{{ $ps->specification->name }}</dt>
+                                                <dd>{{ $ps->value }}</dd>
+                                            </div>
+                                        @endforeach
+                                    </dl>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </section>
     @endif
 
-    {{-- SPECIFICATIONS --}}
-    @if($specGroups->isNotEmpty())
-    <div class="row mt-4">
-        <div class="col-lg-9">
-            <h4>Specifications</h4>
-            @foreach($specGroups as $groupName => $specs)
-                <h6 class="text-muted text-uppercase small mt-3">{{ $groupName }}</h6>
-                <table class="table table-sm table-striped">
-                    <tbody>
-                        @foreach($specs as $ps)
-                            <tr>
-                                <th style="width:40%">{{ $ps->specification->name }}</th>
-                                <td>{{ $ps->value }}</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            @endforeach
-        </div>
-    </div>
-    @endif
-
-    {{-- RELATED PRODUCTS --}}
+    {{-- ================= RELATED PRODUCTS ================= --}}
     @if($related->isNotEmpty())
-    <div class="mt-5">
-        <h4 class="mb-3">Related Products</h4>
-        <div class="row">
-            @foreach($related as $relatedProduct)
-                @include('frontend.partials.product-card', ['product' => $relatedProduct])
-            @endforeach
-        </div>
-    </div>
+        <section class="pd-section">
+            <div class="pd-section-head">
+                <div class="section-eyebrow">More to explore</div>
+                <h2 class="section-title">Related products</h2>
+            </div>
+            <div class="row">
+                @foreach($related as $relatedProduct)
+                    @include('frontend.partials.product-card', ['product' => $relatedProduct])
+                @endforeach
+            </div>
+        </section>
     @endif
 
-    {{-- FAQ --}}
+    {{-- ================= FAQ ================= --}}
     @if($faqs->isNotEmpty())
-    <section class="faq-section mt-5">
-        <h4 class="mb-3">Frequently Asked Questions</h4>
-        <div class="accordion faq-accordion" id="faqAccordion">
-            @foreach($faqs as $faq)
-                <div class="accordion-item">
-                    <h2 class="accordion-header">
-                        <button class="accordion-button {{ $loop->first ? '' : 'collapsed' }}" type="button"
-                                data-bs-toggle="collapse" data-bs-target="#faq{{ $faq->id }}"
-                                aria-expanded="{{ $loop->first ? 'true' : 'false' }}" aria-controls="faq{{ $faq->id }}">
-                            {{ $faq->question }}
-                        </button>
-                    </h2>
-                    <div id="faq{{ $faq->id }}" class="accordion-collapse collapse {{ $loop->first ? 'show' : '' }}" data-bs-parent="#faqAccordion">
-                        <div class="accordion-body">{!! nl2br(e($faq->answer)) !!}</div>
+        <section class="pd-section">
+            <div class="row g-4 g-lg-5">
+                <div class="col-lg-4">
+                    <div class="pd-faq-aside">
+                        <div class="section-eyebrow">FAQ</div>
+                        <h2 class="section-title">Frequently asked questions</h2>
+                        <p class="mt-2">Can't find what you are looking for? Send us a message and our team will get back to you.</p>
+                        <a href="{{ route('contact.create') }}" class="btn btn-outline-brand">Contact us</a>
                     </div>
                 </div>
-            @endforeach
-        </div>
 
-        {{-- Lets Google show these as FAQ rich results --}}
-        <script type="application/ld+json">
-            {!! json_encode([
-                '@context' => 'https://schema.org',
-                '@type' => 'FAQPage',
-                'mainEntity' => $faqs->map(fn ($f) => [
-                    '@type' => 'Question',
-                    'name' => $f->question,
-                    'acceptedAnswer' => ['@type' => 'Answer', 'text' => $f->answer],
-                ])->values(),
-            ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}
-        </script>
-    </section>
+                <div class="col-lg-8">
+                    <div class="accordion faq-accordion" id="faqAccordion">
+                        @foreach($faqs as $faq)
+                            <div class="accordion-item">
+                                <h3 class="accordion-header">
+                                    <button class="accordion-button {{ $loop->first ? '' : 'collapsed' }}" type="button"
+                                            data-bs-toggle="collapse" data-bs-target="#faq{{ $faq->id }}"
+                                            aria-expanded="{{ $loop->first ? 'true' : 'false' }}" aria-controls="faq{{ $faq->id }}">
+                                        {{ $faq->question }}
+                                    </button>
+                                </h3>
+                                <div id="faq{{ $faq->id }}" class="accordion-collapse collapse {{ $loop->first ? 'show' : '' }}" data-bs-parent="#faqAccordion">
+                                    <div class="accordion-body">{!! nl2br(e($faq->answer)) !!}</div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+
+            <script type="application/ld+json">
+                {!! json_encode([
+                    '@context' => 'https://schema.org',
+                    '@type' => 'FAQPage',
+                    'mainEntity' => $faqs->map(fn ($f) => [
+                        '@type' => 'Question',
+                        'name' => $f->question,
+                        'acceptedAnswer' => ['@type' => 'Answer', 'text' => $f->answer],
+                    ])->values(),
+                ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}
+            </script>
+        </section>
     @endif
 </div>
 
-{{-- Mobile sticky action bar (section 53) --}}
-<div class="d-md-none fixed-bottom bg-white border-top p-2 d-flex gap-2">
-    <a href="https://wa.me/{{ \App\Models\Setting::get('whatsapp_number', '971500000000') }}?text={{ urlencode($product->whatsappMessage()) }}"
-       target="_blank" class="btn btn-success flex-fill">WhatsApp</a>
-    <button type="button" class="btn btn-primary flex-fill" onclick="document.getElementById('quickAddForm').submit()">Request Quote</button>
+{{-- Mobile sticky action bar --}}
+<div class="pd-mobile-bar d-md-none">
+    <a href="{{ $waLink }}" target="_blank" rel="noopener" class="btn btn-success flex-fill">WhatsApp</a>
+    <button type="submit" form="quickAddForm" class="btn btn-primary flex-fill">Request Quote</button>
 </div>
+@endsection
+
+@section('scripts')
+<script>
+(function () {
+    // Thumbnails follow the main image
+    const gallery = document.getElementById('productGallery');
+    if (gallery) {
+        const thumbs = document.querySelectorAll('.pd-thumb');
+        gallery.addEventListener('slid.bs.carousel', function (e) {
+            thumbs.forEach(function (t, i) { t.classList.toggle('active', i === e.to); });
+        });
+    }
+
+    // Quantity stepper; the chosen quantity is also sent with "Request Quote"
+    const qty = document.getElementById('pdQty');
+    const quickQty = document.getElementById('quickQty');
+    if (qty) {
+        const sync = function () {
+            qty.value = Math.max(1, parseInt(qty.value || '1', 10) || 1);
+            if (quickQty) quickQty.value = qty.value;
+        };
+        document.querySelectorAll('[data-qty]').forEach(function (b) {
+            b.addEventListener('click', function () {
+                qty.value = (parseInt(qty.value || '1', 10) || 1) + parseInt(b.dataset.qty, 10);
+                sync();
+            });
+        });
+        qty.addEventListener('input', sync);
+        qty.addEventListener('change', sync);
+    }
+})();
+</script>
 @endsection
