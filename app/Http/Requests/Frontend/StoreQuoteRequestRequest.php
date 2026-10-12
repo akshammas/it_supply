@@ -18,15 +18,11 @@ class StoreQuoteRequestRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255'],
-            'company_name' => ['nullable', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255'],
-            'phone' => ['required', 'string', 'max:30'],
+            'name'    => ['required', 'string', 'max:255'],
+            'email'   => ['required', 'email', 'max:255'],
+            'phone'   => ['required', 'string', 'max:30'],
+            'subject' => ['required', 'string', 'max:150'],
             'message' => ['nullable', 'string', 'max:2000'],
-            'delivery_location' => ['nullable', 'string', 'max:255'],
-            'trn' => ['nullable', 'string', 'max:50'],
-            'emirate' => ['nullable', 'string', 'max:50'],
-            'required_delivery_date' => ['nullable', 'date', 'after_or_equal:today'],
         ];
     }
 }

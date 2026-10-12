@@ -91,7 +91,7 @@
             </form>
 
             <a href="{{ route('enquiry.index') }}" class="btn btn-outline-brand position-relative">
-                <i class="bi bi-cart3 me-1"></i> Quote List
+                <i class="bi bi-cart3 me-1"></i>
                 @php($cartCount = app(\App\Services\EnquiryCartService::class)->count())
                 @if($cartCount > 0)
                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill quote-badge">{{ $cartCount }}</span>

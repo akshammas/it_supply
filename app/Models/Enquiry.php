@@ -14,7 +14,7 @@ class Enquiry extends Model
     use LogsActivity;
 
     protected $fillable = [
-        'customer_id', 'name', 'company_name', 'email', 'phone', 'message',
+        'customer_id', 'name', 'company_name', 'email', 'phone', 'subject', 'message',
         'delivery_location', 'required_delivery_date', 'status',
     ];
 

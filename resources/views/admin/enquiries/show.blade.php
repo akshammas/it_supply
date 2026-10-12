@@ -29,10 +29,12 @@
                 </table>
             </div>
 
-            @if($enquiry->message)
+            @if($enquiry->subject || $enquiry->message)
                 <div class="card shadow-sm mb-3">
-                    <div class="card-header bg-white fw-semibold">Message</div>
-                    <div class="card-body">{{ $enquiry->message }}</div>
+                    <div class="card-header bg-white fw-semibold">{{ $enquiry->subject ?: 'Message' }}</div>
+                    @if($enquiry->message)
+                        <div class="card-body" style="white-space:pre-line">{{ $enquiry->message }}</div>
+                    @endif
                 </div>
             @endif
         </div>

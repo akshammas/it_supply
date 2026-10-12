@@ -46,24 +46,19 @@ class QuoteRequestController extends Controller
             $customer = Customer::firstOrCreate(
                 ['email' => $data['email']],
                 [
-                    'name' => $data['name'],
-                    'company_name' => $data['company_name'] ?? null,
+                    'name'  => $data['name'],
                     'phone' => $data['phone'],
-                    'trn' => $data['trn'] ?? null,
-                    'emirate' => $data['emirate'] ?? null,
                 ]
             );
 
             $enquiry = Enquiry::create([
                 'customer_id' => $customer->id,
-                'name' => $data['name'],
-                'company_name' => $data['company_name'] ?? null,
-                'email' => $data['email'],
-                'phone' => $data['phone'],
-                'message' => $data['message'] ?? null,
-                'delivery_location' => $data['delivery_location'] ?? null,
-                'required_delivery_date' => $data['required_delivery_date'] ?? null,
-                'status' => 'new',
+                'name'        => $data['name'],
+                'email'       => $data['email'],
+                'phone'       => $data['phone'],
+                'subject'     => $data['subject'],
+                'message'     => $data['message'] ?? null,
+                'status'      => 'new',
             ]);
 
             foreach ($this->cart->items() as $item) {

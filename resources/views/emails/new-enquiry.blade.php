@@ -11,6 +11,9 @@
         @endif
         <tr><td style="padding:4px 0;"><strong>Email:</strong></td><td>{{ $enquiry->email }}</td></tr>
         <tr><td style="padding:4px 0;"><strong>Phone:</strong></td><td>{{ $enquiry->phone }}</td></tr>
+        @if($enquiry->subject)
+        <tr><td style="padding:4px 0;"><strong>Subject:</strong></td><td>{{ $enquiry->subject }}</td></tr>
+        @endif
         @if($enquiry->delivery_location)
         <tr><td style="padding:4px 0;"><strong>Delivery Location:</strong></td><td>{{ $enquiry->delivery_location }}</td></tr>
         @endif
