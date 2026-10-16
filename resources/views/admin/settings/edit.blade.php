@@ -17,16 +17,32 @@
                     <label class="form-label">Company Name</label>
                     <input type="text" name="company_name" value="{{ old('company_name', $settings['company_name'] ?? '') }}" class="form-control">
                 </div>
-                <div class="col-md-3">
-                    <label class="form-label">Logo</label>
-                    <input type="file" name="logo" class="form-control" accept="image/*">
-                    @if(!empty($settings['logo']))<img src="{{ Storage::url($settings['logo']) }}" class="mt-2" style="max-height:40px">@endif
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label">Favicon</label>
-                    <input type="file" name="favicon" class="form-control" accept="image/*">
-                    @if(!empty($settings['favicon']))<img src="{{ Storage::url($settings['favicon']) }}" class="mt-2" style="max-height:24px">@endif
-                </div>
+              <div class="col-md-3">
+                <label class="form-label">Logo</label>
+                <input type="file" name="logo" class="form-control" accept=".png,.jpg,.jpeg,.webp,.svg">
+                @if(!empty($settings['logo']))
+                    <div class="mt-2 p-2 border rounded bg-light d-inline-block">
+                        <img src="{{ Storage::url($settings['logo']) }}" alt="Logo" style="max-height:40px; max-width:100%;">
+                    </div>
+                    <div class="form-check mt-2">
+                        <input class="form-check-input" type="checkbox" name="remove_logo" value="1" id="remove_logo">
+                        <label class="form-check-label small text-danger" for="remove_logo">Remove logo</label>
+                    </div>
+                @endif
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Favicon</label>
+                <input type="file" name="favicon" class="form-control" accept=".png,.ico,.svg,.webp,.jpg,.jpeg">
+                @if(!empty($settings['favicon']))
+                    <div class="mt-2 p-2 border rounded bg-light d-inline-block">
+                        <img src="{{ Storage::url($settings['favicon']) }}" alt="Favicon" style="max-height:24px; max-width:100%;">
+                    </div>
+                    <div class="form-check mt-2">
+                        <input class="form-check-input" type="checkbox" name="remove_favicon" value="1" id="remove_favicon">
+                        <label class="form-check-label small text-danger" for="remove_favicon">Remove favicon</label>
+                    </div>
+                @endif
+            </div>
                 <div class="col-md-4">
                     <label class="form-label">Email</label>
                     <input type="email" name="email" value="{{ old('email', $settings['email'] ?? '') }}" class="form-control">

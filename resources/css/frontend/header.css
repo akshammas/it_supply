@@ -309,6 +309,79 @@
     animation-delay: .28s;
 }
 
+/* Side padding for the header bar (the navbar's own padding resets .container's) */
+.site-header .navbar {
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+@media (min-width: 992px) {
+    /* On desktop, line the header up with the page content below it */
+    .site-header .navbar {
+        padding-left: .75rem;
+        padding-right: .75rem;
+    }
+}
+
+/* ================= Mobile and tablet navigation (below 992px) ================= */
+@media (max-width: 991.98px) {
+
+    /* Header bar */
+    .site-header .navbar { padding-top: .6rem !important; padding-bottom: .6rem !important; }
+    .brand-logo {
+        font-size: 1.2rem; max-width: calc(100% - 64px);
+        overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .navbar-toggler { border: 1.5px solid #e3e6ea; border-radius: 10px; padding: .4rem .6rem; }
+    .navbar-toggler:focus { box-shadow: 0 0 0 .2rem rgba(228,0,43,.15); }
+
+    /* The open menu scrolls inside the screen instead of running off it */
+    .navbar-collapse {
+        max-height: calc(100vh - 72px); overflow-y: auto; overscroll-behavior: contain;
+        padding: .5rem 0 1rem;
+    }
+
+    /* Nav links: full-width rows with a comfortable tap size */
+    .main-nav .nav-link {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: .85rem .75rem; border-bottom: 1px solid #f0f1f4; border-radius: 0;
+    }
+    .main-nav .nav-link::after { display: none; }                 /* no underline on mobile */
+    .main-nav .nav-link.active {
+        background: var(--brand-red-light); color: var(--brand-red);
+        border-radius: 10px; border-bottom-color: transparent;
+    }
+
+    /* Mega menu becomes a normal block inside the open menu */
+    .mega-menu {
+        position: static; background: #f8f9fb; border: 0; border-radius: 12px;
+        box-shadow: none; padding: .5rem; margin: .25rem 0 .5rem;
+        display: none; opacity: 1; visibility: visible; transform: none;
+        pointer-events: auto; transition: none;
+    }
+    .mega-menu.show { display: block; }
+    .mega-menu > .container { max-width: 100%; padding: 0; }      /* no double side padding */
+    .mega-menu .row { --bs-gutter-x: 0; --bs-gutter-y: .5rem; margin: 0; }
+    .mega-menu .mega-col { width: 50%; padding: .75rem .85rem; }
+    .mega-col a { overflow-wrap: anywhere; }
+
+    /* Search + Quote List fill the width */
+    .navbar form[role="search"] { width: 100%; margin: .75rem 0 !important; }
+    .navbar form[role="search"] .form-control { flex: 1; min-width: 0; }
+    .navbar .btn-outline-brand.position-relative {
+        display: flex; align-items: center; justify-content: center; width: 100%;
+    }
+    /* The count badge sits inside the button instead of hanging off its corner */
+    .navbar .quote-badge { position: static !important; transform: none !important; margin-left: .5rem; }
+}
+
+/* Phones: one column in the mega menu */
+@media (max-width: 575.98px) {
+    .mega-menu .mega-col { width: 100%; }
+}
+
+/* Safety net: never allow sideways page scroll */
+html { overflow-x: clip; }
+
 @media (prefers-reduced-motion: reduce) {
 
     .mega-menu,
@@ -320,28 +393,15 @@
     }
 }
 
+
 @media (max-width: 767px) {
     .mega-menu {
         position: static;
         box-shadow: none;
-        border-radius: 0;
-        padding: .75rem 0;
-        display: none;
-        opacity: 1;
-        visibility: visible;
-        transform: none;
-        pointer-events: auto;
-        transition: none;
-    }
-
-    .mega-menu.show {
-        display: block;
     }
 }
 
-@media (max-width: 767px) {
-    .mega-menu {
-        position: static;
-        box-shadow: none;
-    }
+.brand-logo-img { display: block; max-height: 44px; max-width: 180px; width: auto; object-fit: contain; }
+@media (max-width: 991.98px) {
+    .brand-logo-img { max-height: 36px; max-width: 150px; }
 }

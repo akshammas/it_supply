@@ -6,6 +6,7 @@
     <title>@yield('title', \App\Models\Setting::get('seo_title', config('app.name')))</title>
     <meta name="description" content="@yield('meta_description', \App\Models\Setting::get('seo_description', 'Enterprise IT products and solutions for businesses across the UAE.'))">
     <link rel="canonical" href="{{ url()->current() }}">
+    @include('frontend.partials.favicon')
 
     <meta property="og:type" content="website">
     <meta property="og:title" content="@yield('title', \App\Models\Setting::get('seo_title', config('app.name')))">
@@ -23,8 +24,16 @@
 
 <header class="site-header bg-white sticky-top">
     <nav class="navbar navbar-expand-lg container py-3">
-        <a class="brand-logo text-decoration-none" href="{{ route('home') }}">
-            {{ \App\Models\Setting::get('company_name', config('app.name')) }}<span>.</span>
+        @php
+            $siteName = \App\Models\Setting::get('company_name', config('app.name'));
+            $siteLogo = \App\Models\Setting::get('logo');
+        @endphp
+        <a class="brand-logo text-decoration-none d-flex align-items-center" href="{{ route('home') }}">
+            @if($siteLogo)
+                <img src="{{ Storage::url($siteLogo) }}" alt="{{ $siteName }}" class="brand-logo-img">
+            @else
+                {{ $siteName }}<span>.</span>
+            @endif
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
             <span class="navbar-toggler-icon"></span>
@@ -140,37 +149,40 @@
 
 
 <script>
-    // Simple hover-controlled mega menu (desktop) / click-to-toggle (mobile)
-    const megaWrap = document.getElementById('productsMegaWrap');
-    const megaMenu = document.getElementById('productsMega');
-    const megaToggle = document.getElementById('productsMegaToggle');
-    let hideTimer;
+  const megaWrap = document.getElementById('productsMegaWrap');
+const megaMenu = document.getElementById('productsMega');
+const megaToggle = document.getElementById('productsMegaToggle');
+const isDesktop = () => window.matchMedia('(min-width: 992px)').matches;
+let hideTimer;
 
-   function showMega() {
-        clearTimeout(hideTimer);
-        megaMenu.classList.add('show');
-        megaToggle.classList.add('show');
-    }
-    function hideMegaDelayed() {
-        hideTimer = setTimeout(() => {
-            megaMenu.classList.remove('show');
-            megaToggle.classList.remove('show');
-        }, 150);
-    }
+function showMega() {
+    clearTimeout(hideTimer);
+    megaMenu.classList.add('show');
+    megaToggle.classList.add('show');
+}
+function hideMega() {
+    megaMenu.classList.remove('show');
+    megaToggle.classList.remove('show');
+}
+function hideMegaDelayed() { hideTimer = setTimeout(hideMega, 150); }
 
-    if (window.innerWidth > 991) {
-        megaWrap.addEventListener('mouseenter', showMega);
-        megaWrap.addEventListener('mouseleave', hideMegaDelayed);
-        megaWrap.addEventListener('focusin', showMega);      // keyboard: Tab into the menu
-        megaWrap.addEventListener('focusout', hideMegaDelayed);
-        document.addEventListener('keydown', e => { if (e.key === 'Escape') hideMegaDelayed(); });
-    } else {
-        megaToggle.addEventListener('click', function (e) {
-            e.preventDefault();
-            megaMenu.classList.toggle('show');
-            megaToggle.classList.toggle('show');
-        });
-    }
+// Desktop: hover and keyboard focus
+megaWrap.addEventListener('mouseenter', () => { if (isDesktop()) showMega(); });
+megaWrap.addEventListener('mouseleave', () => { if (isDesktop()) hideMegaDelayed(); });
+megaWrap.addEventListener('focusin', () => { if (isDesktop()) showMega(); });
+megaWrap.addEventListener('focusout', () => { if (isDesktop()) hideMegaDelayed(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') hideMega(); });
+
+// Mobile and tablet: tap "Products" to open or close the list
+megaToggle.addEventListener('click', function (e) {
+    if (isDesktop()) return;           // on desktop the link goes to the products page
+    e.preventDefault();
+    megaMenu.classList.toggle('show');
+    megaToggle.classList.toggle('show');
+});
+
+// Going back to desktop width resets the mobile open state
+window.matchMedia('(min-width: 992px)').addEventListener('change', hideMega);
 </script>
 @yield('scripts')
 </body>

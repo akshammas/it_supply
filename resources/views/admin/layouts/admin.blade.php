@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Admin') | {{ config('app.name') }}</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    @include('frontend.partials.favicon')
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     @php

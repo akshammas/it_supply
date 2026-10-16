@@ -7,6 +7,7 @@ use App\Models\Setting;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * Section 51: one screen, key-value settings, no .env editing needed for
@@ -39,6 +40,8 @@ class SettingController extends Controller
             'company_name' => ['nullable', 'string', 'max:255'],
             'logo' => ['nullable', 'image', 'max:1024'],
             'favicon' => ['nullable', 'image', 'max:512'],
+            'remove_logo'    => ['nullable', 'boolean'],
+            'remove_favicon' => ['nullable', 'boolean'],
             'email' => ['nullable', 'email', 'max:255'],
             'phone' => ['nullable', 'string', 'max:30'],
             'whatsapp_number' => ['nullable', 'string', 'max:20'],
@@ -57,13 +60,26 @@ class SettingController extends Controller
         ]);
 
         foreach ($this->fileFields as $field) {
-            if ($request->hasFile($field)) {
-                $data[$field] = $request->file($field)->store('settings', 'public');
-            } else {
-                unset($data[$field]); // don't overwrite an existing logo/favicon with nothing
-            }
-        }
+            $old = Setting::get($field);
 
+            if ($request->hasFile($field)) {
+                // New upload: delete the old file, then store the new one
+                if ($old) {
+                    Storage::disk('public')->delete($old);
+                }
+                $data[$field] = $request->file($field)->store('settings', 'public');
+            } elseif ($request->boolean('remove_' . $field)) {
+                // Remove ticked: delete the file and clear the setting
+                if ($old) {
+                    Storage::disk('public')->delete($old);
+                }
+                $data[$field] = null;
+            } else {
+                unset($data[$field]); // nothing uploaded, keep the existing file
+            }
+
+            unset($data['remove_' . $field]); // not a real setting key
+        }
         foreach ($data as $key => $value) {
             Setting::set($key, $value);
         }
