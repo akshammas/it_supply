@@ -13,6 +13,13 @@ class User extends Authenticatable
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
+    public const ROLES = [
+        'super_admin'     => 'Super Admin',
+        'product_manager' => 'Product Manager',
+        'sales'           => 'Sales',
+        'content_manager' => 'Content Manager',
+    ];
+
     /**
      * The attributes that are mass assignable.
      *
@@ -43,7 +50,8 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
-            'password' => 'hashed',
+            'last_login_at'     => 'datetime',
+            'password'          => 'hashed',
         ];
     }
 }

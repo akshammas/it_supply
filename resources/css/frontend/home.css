@@ -160,3 +160,42 @@
         animation: none !important;
     }
 }
+/* Hero fills the first screen below the header */
+.hero-fill {
+    height: calc(100vh - var(--header-h, 76px));
+    height: calc(100svh - var(--header-h, 76px));
+    min-height: 460px;
+    max-height: 820px;
+    position: relative;
+    background: #111;
+}
+.hero-fill-static { max-height: none; }
+
+.hero-slide {
+    position: relative;
+    height: 100%;
+    overflow: hidden;
+}
+.hero-bg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+/* dark gradient so the text stays readable on any image */
+.hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,.35) 0%, rgba(0,0,0,.55) 100%);
+}
+
+.hero-fill .carousel-indicators { z-index: 3; margin-bottom: 1.5rem; }
+.hero-fill .carousel-control-prev,
+.hero-fill .carousel-control-next { z-index: 3; width: 8%; }
+
+@media (max-width: 767.98px) {
+    .hero-fill { min-height: 420px; max-height: 640px; }
+    .hero-fill .carousel-control-prev,
+    .hero-fill .carousel-control-next { display: none; }
+}

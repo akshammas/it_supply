@@ -3,23 +3,25 @@
 
 @section('content')
 
-    {{-- HERO --}}
-     @if($heroBanners->isNotEmpty())
-        <div id="heroCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="5000">
+    {{-- HERO (fills the first screen) --}}
+    @if($heroBanners->isNotEmpty())
+        <div id="heroCarousel" class="carousel slide carousel-fade hero-fill" data-bs-ride="carousel" data-bs-interval="5000">
             @if($heroBanners->count() > 1)
                 <div class="carousel-indicators">
                     @foreach($heroBanners as $banner)
-                        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="{{ $loop->index }}" class="{{ $loop->first ? 'active' : '' }}"></button>
+                        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="{{ $loop->index }}" class="{{ $loop->first ? 'active' : '' }}" aria-label="Slide {{ $loop->iteration }}"></button>
                     @endforeach
                 </div>
             @endif
-            <div class="carousel-inner">
+
+            <div class="carousel-inner h-100">
                 @foreach($heroBanners as $banner)
-                    <div class="carousel-item {{ $loop->first ? 'active' : '' }}">
-                        <div class="position-relative overflow-hidden text-white d-flex align-items-center" style="height:420px; background:#111;">
+                    <div class="carousel-item h-100 {{ $loop->first ? 'active' : '' }}">
+                        <div class="hero-slide text-white d-flex align-items-center">
                             <div class="hero-bg" style="background-image:url('{{ Storage::url($banner->image) }}');"></div>
+                            <div class="hero-overlay"></div>
                             <div class="container position-relative text-center py-4">
-                                <h1 class="display-5 fw-bold hero-anim">{{ $banner->title ?: \App\Models\Setting::get('hero_title', 'Enterprise IT Products & Solutions') }}</h1>
+                                <h1 class="display-4 fw-bold hero-anim">{{ $banner->title ?: \App\Models\Setting::get('hero_title', 'Enterprise IT Products & Solutions') }}</h1>
                                 <p class="lead text-white-50 hero-anim">{{ $banner->subtitle ?: \App\Models\Setting::get('hero_subtitle', 'For Businesses Across UAE') }}</p>
                                 <div class="hero-anim">
                                     <a href="{{ route('products.index') }}" class="btn btn-brand btn-lg me-2">Explore Products</a>
@@ -30,17 +32,32 @@
                     </div>
                 @endforeach
             </div>
+
+            
         </div>
     @else
-        <section style="background:var(--ink);" class="text-white py-5">
+        <section class="hero-fill hero-fill-static text-white d-flex align-items-center" style="background:var(--ink);">
             <div class="container text-center py-4">
-                <h1 class="display-5 fw-bold">{{ \App\Models\Setting::get('hero_title', 'Enterprise IT Products & Solutions') }}</h1>
+                <h1 class="display-4 fw-bold">{{ \App\Models\Setting::get('hero_title', 'Enterprise IT Products & Solutions') }}</h1>
                 <p class="lead text-white-50">{{ \App\Models\Setting::get('hero_subtitle', 'For Businesses Across UAE') }}</p>
                 <a href="{{ route('products.index') }}" class="btn btn-brand btn-lg me-2">Explore Products</a>
                 <a href="{{ route('quote-request.create') }}" class="btn btn-outline-light btn-lg">Request a Quote</a>
             </div>
         </section>
     @endif
+
+    <script>
+        // Make the hero exactly fill the screen below the sticky header
+        (function () {
+            function setHeaderHeight() {
+                var h = document.querySelector('.site-header');
+                if (h) document.documentElement.style.setProperty('--header-h', h.offsetHeight + 'px');
+            }
+            setHeaderHeight();
+            window.addEventListener('resize', setHeaderHeight);
+            window.addEventListener('load', setHeaderHeight);
+        })();
+    </script>
 
     {{-- PROMO BANNERS --}}
     @if($promoBanners->isNotEmpty())

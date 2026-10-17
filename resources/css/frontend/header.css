@@ -210,7 +210,6 @@
 
 .mega-col:hover .mega-col-icon {
     background: var(--brand-red);
-    transform: rotate(-6deg) scale(1.08);
 }
 
 .mega-col:hover .mega-col-icon img {

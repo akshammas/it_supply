@@ -39,7 +39,7 @@
                 ['FAQs', 'bi-question-circle', 'admin.faqs.index', ['admin.faqs.*']],
             ],
             'System' => [
-                ['Admin Users', 'bi-person-badge', null, [], null, true],
+                ['Admin Users', 'bi-person-badge', 'admin.users.index', ['admin.users.*']],
                 ['Settings', 'bi-gear', 'admin.settings.edit', ['admin.settings.*']],
             ],
         ];
