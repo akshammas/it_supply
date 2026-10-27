@@ -12,6 +12,7 @@ use App\Http\Controllers\Frontend\QuoteRequestController;
 use App\Http\Controllers\Frontend\SearchController;
 use App\Http\Controllers\Frontend\SitemapController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Frontend\PopupLeadController;
 
 /*
 |--------------------------------------------------------------------------
@@ -48,6 +49,8 @@ Route::get('/thank-you', [QuoteRequestController::class, 'thankYou'])->name('quo
 
 Route::get('/contact', [ContactController::class, 'create'])->name('contact.create');
 Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
+
+Route::post('/popup-lead', [PopupLeadController::class, 'store'])->middleware('throttle:5,1')->name('popup-lead.store');
 
 
 Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');

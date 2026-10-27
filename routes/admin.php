@@ -19,6 +19,8 @@ use App\Http\Controllers\Admin\SpecificationGroupController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\FaqController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\PopupController;
+use App\Http\Controllers\Admin\PopupLeadController;
 
 /*
 |--------------------------------------------------------------------------
@@ -98,6 +100,14 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::middleware('role:super_admin')->group(function () {
             Route::resource('users', UserController::class)->except('show');
         });
+
+        Route::resource('popups', PopupController::class)->except('show');
+        Route::patch('popups/{popup}/toggle', [PopupController::class, 'toggle'])->name('popups.toggle');
+
+        Route::get('popup-leads', [PopupLeadController::class, 'index'])->name('popup-leads.index');
+        Route::get('popup-leads/export', [PopupLeadController::class, 'export'])->name('popup-leads.export');
+        Route::patch('popup-leads/{popupLead}/status', [PopupLeadController::class, 'toggleStatus'])->name('popup-leads.status');
+        Route::delete('popup-leads/{popupLead}', [PopupLeadController::class, 'destroy'])->name('popup-leads.destroy');
 
         // Still open: customers list, users management, 2FA.
     });

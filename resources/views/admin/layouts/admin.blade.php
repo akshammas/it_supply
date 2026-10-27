@@ -29,14 +29,16 @@
             ],
             'Sales' => [
                 ['Enquiries', 'bi-envelope', 'admin.enquiries.index', ['admin.enquiries.*'], $newEnquiries],
+                ['Popup Leads', 'bi-person-lines-fill', 'admin.popup-leads.index', ['admin.popup-leads.*']],
                 ['Quotes', 'bi-file-earmark-text', 'admin.quotes.index', ['admin.quotes.*']],
-                ['Customers', 'bi-people', null, []],
+                ['Customers', 'bi-people', null,['Popup Leads', 'bi-person-lines-fill', 'admin.popup-leads.index', ['admin.popup-leads.*']], []],
             ],
             'Content' => [
                 ['Blog', 'bi-journal-text', 'admin.blog.index', ['admin.blog.*', 'admin.blog-categories.*']],
                 ['Pages', 'bi-file-earmark', 'admin.pages.index', ['admin.pages.*']],
                 ['Banners', 'bi-images', 'admin.banners.index', ['admin.banners.*']],
                 ['FAQs', 'bi-question-circle', 'admin.faqs.index', ['admin.faqs.*']],
+                ['Popups', 'bi-window-stack', 'admin.popups.index', ['admin.popups.*']],
             ],
             'System' => [
                 ['Admin Users', 'bi-person-badge', 'admin.users.index', ['admin.users.*']],

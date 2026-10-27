@@ -111,6 +111,7 @@
 </header>
 
 <main>
+    @include('frontend.partials.popup')
     @yield('content')
 </main>
 
