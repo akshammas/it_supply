@@ -162,10 +162,10 @@
 }
 /* Hero fills the first screen below the header */
 .hero-fill {
-    height: calc(100vh - var(--header-h, 76px));
-    height: calc(100svh - var(--header-h, 76px));
-    min-height: 460px;
-    max-height: 820px;
+    height: calc((100vh - var(--header-h, 76px)) * 0.5);
+    height: calc((100svh - var(--header-h, 76px)) * 0.5);
+    min-height: 320px;
+    max-height: 480px;
     position: relative;
     background: #111;
 }
@@ -195,7 +195,653 @@
 .hero-fill .carousel-control-next { z-index: 3; width: 8%; }
 
 @media (max-width: 767.98px) {
-    .hero-fill { min-height: 420px; max-height: 640px; }
+    .hero-fill { min-height: 300px; max-height: 420px; }
     .hero-fill .carousel-control-prev,
     .hero-fill .carousel-control-next { display: none; }
+}
+.hero-fill h1 { font-size: clamp(1.6rem, 3.4vw, 2.75rem); }
+.hero-fill .lead { font-size: clamp(.95rem, 1.6vw, 1.15rem); }
+.hero-fill .btn-lg { padding: .6rem 1.4rem; font-size: 1rem; }
+
+.promo-strip img {
+    height: calc((100svh - var(--header-h, 76px)) * 0.5 - 2rem);
+    min-height: 140px;
+    max-height: 260px;
+}
+
+/* =====================================================================
+   HOME PAGE ADDITIONS
+   Append this block to the end of your existing home CSS.
+   Everything is scoped to .home or prefixed hm-, so it will not touch
+   other pages.
+   ===================================================================== */
+
+.home {
+    --hm-ink: var(--ink, #0b1017);
+    --hm-steel: #9aa6b4;
+    --hm-text: #18202a;
+    --hm-muted: #566170;
+    --hm-mist: #f4f6f8;
+    --hm-line: #e2e6ea;
+    --hm-line-dark: rgba(255, 255, 255, .11);
+    --hm-red: var(--brand-red, #e4002b);
+    --hm-ease: cubic-bezier(.2, .7, .2, 1);
+    overflow-x: clip;
+}
+
+/* One heading typeface across the whole home page (Sora is loaded in the view) */
+.home h1,
+.home h2,
+.home h3,
+.home .section-title {
+    font-family: 'Sora', system-ui, sans-serif;
+    letter-spacing: -.02em;
+}
+
+.home a:focus-visible,
+.home summary:focus-visible {
+    outline: 2px solid var(--hm-red);
+    outline-offset: 3px;
+}
+
+/* Button hover on the home page */
+.home .btn {
+    transition: transform .25s var(--hm-ease), box-shadow .25s var(--hm-ease), background-color .25s, color .25s, border-color .25s;
+}
+
+.home .btn-brand:hover,
+.home .btn-outline-brand:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 28px -14px rgba(228, 0, 43, .55);
+}
+
+/* ---- Sections ---- */
+.hm-sec {
+    padding: clamp(3rem, 7vw, 5.5rem) 0;
+}
+
+.hm-mist {
+    background: var(--hm-mist);
+}
+
+.hm-dark {
+    background: var(--hm-ink);
+    color: #e7ebf0;
+}
+
+.hm-head {
+    max-width: 40rem;
+    margin-bottom: 2.5rem;
+}
+
+.hm-h2 {
+    font-size: clamp(1.6rem, 2.8vw, 2.25rem);
+    font-weight: 700;
+    line-height: 1.18;
+    margin-bottom: 1rem;
+    color: var(--hm-text);
+}
+
+.hm-lead {
+    max-width: 56ch;
+    color: var(--hm-muted);
+    line-height: 1.7;
+    margin-bottom: 1.25rem;
+}
+
+.hm-dark .hm-h2,
+.hm-dark h3,
+.hm-cta .hm-h2 {
+    color: #fff;
+}
+
+.hm-dark .hm-lead,
+.hm-dark p,
+.hm-cta .hm-lead {
+    color: var(--hm-steel);
+}
+
+.hm-link {
+    color: var(--hm-red);
+    font-weight: 600;
+    text-decoration: none;
+    background-image: linear-gradient(currentColor, currentColor);
+    background-size: 0 1px;
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    transition: background-size .3s var(--hm-ease);
+}
+
+.hm-link:hover {
+    background-size: 100% 1px;
+    color: var(--hm-red);
+}
+
+.hm-dark .hm-link {
+    color: #fff;
+}
+
+.hm-dark .hm-link:hover {
+    color: #fff;
+}
+
+.hm-ticks {
+    list-style: none;
+    margin: 0 0 1.75rem;
+    padding: 0;
+}
+
+.hm-ticks li {
+    position: relative;
+    padding: .4rem 0 .4rem 1.75rem;
+    color: var(--hm-text);
+}
+
+.hm-ticks li::before {
+    content: "";
+    position: absolute;
+    left: .15rem;
+    top: .75rem;
+    width: .55rem;
+    height: .3rem;
+    border-left: 2px solid var(--hm-red);
+    border-bottom: 2px solid var(--hm-red);
+    transform: rotate(-45deg);
+}
+
+/* ---- Numbers ---- */
+.hm-stats {
+    background: var(--hm-ink);
+    color: #fff;
+}
+
+.hm-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    margin: 0;
+    padding: 0;
+}
+
+.hm-stats-grid > div {
+    display: flex;
+    flex-direction: column;
+    gap: .3rem;
+    padding: 2rem 1rem 2rem 0;
+}
+
+.hm-stats-grid dd {
+    order: 1;
+    margin: 0;
+    font-family: 'Sora', system-ui, sans-serif;
+    font-size: clamp(1.9rem, 4vw, 2.8rem);
+    font-weight: 700;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+}
+
+.hm-stats-grid dt {
+    order: 2;
+    font-weight: 400;
+    font-size: .9rem;
+    color: var(--hm-steel);
+}
+
+@media (min-width: 768px) {
+    .hm-stats-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    .hm-stats-grid > div {
+        padding-left: 1.75rem;
+        border-left: 1px solid var(--hm-line-dark);
+    }
+
+    .hm-stats-grid > div:first-child {
+        padding-left: 0;
+        border-left: 0;
+    }
+}
+
+/* ---- Interface illustrations ---- */
+.hm-mock {
+    margin: 0;
+    background: #fff;
+    border: 1px solid var(--hm-line);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 40px 80px -44px rgba(11, 16, 23, .5);
+    transition: transform .7s var(--hm-ease), box-shadow .7s var(--hm-ease);
+}
+
+@media (min-width: 992px) {
+    .hm-tilt {
+        transform: perspective(1400px) rotateY(-5deg) rotateX(2deg);
+    }
+
+    .hm-tilt-r {
+        transform: perspective(1400px) rotateY(5deg) rotateX(2deg);
+    }
+
+    .hm-tilt:hover,
+    .hm-tilt-r:hover {
+        transform: none;
+        box-shadow: 0 50px 90px -44px rgba(11, 16, 23, .55);
+    }
+}
+
+.hm-mock-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: .95rem 1.2rem;
+    border-bottom: 1px solid var(--hm-line);
+    font-weight: 600;
+}
+
+.hm-badge {
+    padding: .2rem .65rem;
+    border-radius: 999px;
+    background: var(--brand-red-light, #fff0f2);
+    color: var(--hm-red);
+    font-size: .75rem;
+    font-weight: 600;
+}
+
+.hm-line {
+    display: flex;
+    align-items: center;
+    gap: .9rem;
+    padding: .9rem 1.2rem;
+    border-bottom: 1px solid var(--hm-line);
+    transition: background-color .25s;
+}
+
+.hm-line:hover {
+    background: var(--hm-mist);
+}
+
+.hm-thumb {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    background: var(--hm-mist);
+    color: var(--hm-muted);
+}
+
+.hm-line-name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 500;
+}
+
+.hm-qty {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid var(--hm-line);
+    border-radius: 8px;
+    font-variant-numeric: tabular-nums;
+}
+
+.hm-qty span,
+.hm-qty b {
+    padding: .25rem .65rem;
+    font-weight: 500;
+}
+
+.hm-qty span {
+    color: var(--hm-muted);
+}
+
+.hm-mock-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.2rem;
+    color: var(--hm-muted);
+    font-size: .9rem;
+}
+
+.hm-fakebtn {
+    padding: .5rem 1rem;
+    border-radius: 8px;
+    background: var(--hm-red);
+    color: #fff;
+    font-weight: 600;
+    font-size: .875rem;
+}
+
+.hm-group {
+    padding: 1.1rem 1.2rem;
+    border-bottom: 1px solid var(--hm-line);
+}
+
+.hm-group:last-child {
+    border-bottom: 0;
+}
+
+.hm-group-title {
+    margin-bottom: .65rem;
+    font-size: .85rem;
+    color: var(--hm-muted);
+}
+
+.hm-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+}
+
+.hm-chip {
+    padding: .4rem .85rem;
+    border: 1px solid var(--hm-line);
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: .9rem;
+    transition: background-color .25s, color .25s, border-color .25s, transform .25s var(--hm-ease);
+}
+
+.hm-chip:hover {
+    background: var(--hm-ink);
+    border-color: var(--hm-ink);
+    color: #fff;
+    transform: translateY(-2px);
+}
+
+/* Photo or illustration slot */
+.hm-photo {
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 40px 80px -44px rgba(11, 16, 23, .5);
+}
+
+.hm-photo img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    transition: transform 1s var(--hm-ease);
+}
+
+.hm-photo:hover img {
+    transform: scale(1.04);
+}
+
+.hm-art svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    background: var(--hm-mist);
+}
+
+.hm-route {
+    animation: hmDash 1.2s linear infinite;
+}
+
+.hm-pulse {
+    transform-box: fill-box;
+    transform-origin: center;
+    opacity: .35;
+    animation: hmPulse 2.4s ease-out infinite;
+}
+
+/* ---- Who we supply ---- */
+.hm-buyer {
+    position: relative;
+    height: 100%;
+    padding-top: 1.75rem;
+    border-top: 1px solid var(--hm-line-dark);
+}
+
+.hm-buyer::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: -1px;
+    width: 100%;
+    height: 2px;
+    background: var(--hm-red);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform .6s var(--hm-ease);
+}
+
+.hm-buyer:hover::before {
+    transform: scaleX(1);
+}
+
+.hm-buyer-ico {
+    display: block;
+    margin-bottom: 1rem;
+    font-size: 1.6rem;
+    color: #fff;
+    transition: transform .4s var(--hm-ease);
+}
+
+.hm-buyer:hover .hm-buyer-ico {
+    transform: translateY(-4px);
+}
+
+.hm-buyer p {
+    font-size: .95rem;
+    margin-bottom: 1rem;
+}
+
+/* ---- Why buy ---- */
+.hm-why {
+    height: 100%;
+    padding: 1.6rem;
+    border: 1px solid var(--hm-line);
+    border-radius: 12px;
+    background: #fff;
+    transition: border-color .3s, box-shadow .4s var(--hm-ease), transform .4s var(--hm-ease);
+}
+
+.hm-why:hover {
+    border-color: #cfd5db;
+    box-shadow: 0 24px 44px -30px rgba(11, 16, 23, .4);
+    transform: translateY(-5px);
+}
+
+.hm-why-ico {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    margin-bottom: 1rem;
+    border: 1px solid var(--hm-line);
+    border-radius: 12px;
+    font-size: 1.3rem;
+    color: var(--hm-ink);
+    transition: background-color .35s, color .35s, border-color .35s;
+}
+
+.hm-why:hover .hm-why-ico {
+    background: var(--hm-ink);
+    border-color: var(--hm-ink);
+    color: #fff;
+}
+
+.hm-why h3 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-bottom: .4rem;
+}
+
+.hm-why p {
+    margin: 0;
+    font-size: .95rem;
+    color: var(--hm-muted);
+    line-height: 1.6;
+}
+
+/* ---- FAQ ---- */
+.hm-faq {
+    border-top: 2px solid var(--hm-ink);
+}
+
+.hm-faq details {
+    border-bottom: 1px solid var(--hm-line);
+}
+
+.hm-faq summary {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.15rem 0;
+    font-weight: 600;
+    cursor: pointer;
+    list-style: none;
+    transition: color .2s;
+}
+
+.hm-faq summary::-webkit-details-marker {
+    display: none;
+}
+
+.hm-faq summary:hover {
+    color: var(--hm-red);
+}
+
+.hm-faq summary::after {
+    content: "+";
+    font-weight: 400;
+    font-size: 1.5rem;
+    line-height: 1;
+    color: var(--hm-muted);
+    transition: transform .35s var(--hm-ease);
+}
+
+.hm-faq details[open] summary::after {
+    transform: rotate(45deg);
+}
+
+.hm-faq details[open] p {
+    animation: hmRise .45s var(--hm-ease);
+}
+
+.hm-faq details p {
+    margin: 0;
+    padding-bottom: 1.2rem;
+    max-width: 62ch;
+    color: var(--hm-muted);
+    line-height: 1.7;
+}
+
+/* ---- CTA band ---- */
+.hm-cta {
+    position: relative;
+    overflow: hidden;
+    padding: clamp(3.5rem, 8vw, 6rem) 0;
+    background: var(--hm-ink);
+    color: #fff;
+}
+
+.hm-cta::after {
+    content: "";
+    position: absolute;
+    width: 32rem;
+    height: 32rem;
+    right: -10rem;
+    top: -14rem;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(228, 0, 43, .26), transparent 65%);
+    pointer-events: none;
+}
+
+.hm-cta > .container {
+    position: relative;
+    z-index: 1;
+}
+
+.hm-contact {
+    display: flex;
+    align-items: flex-start;
+    gap: .9rem;
+    margin-bottom: .75rem;
+    padding: 1.15rem 1.25rem;
+    border: 1px solid var(--hm-line-dark);
+    border-radius: 12px;
+    color: #fff;
+    text-decoration: none;
+    word-break: break-word;
+    transition: border-color .3s, background-color .3s, transform .35s var(--hm-ease);
+}
+
+.hm-contact:hover {
+    border-color: rgba(255, 255, 255, .35);
+    background: rgba(255, 255, 255, .04);
+    transform: translateY(-3px);
+    color: #fff;
+}
+
+.hm-contact i {
+    font-size: 1.25rem;
+}
+
+.hm-contact small {
+    display: block;
+    margin-bottom: .1rem;
+    color: var(--hm-steel);
+}
+
+/* ---- Reveal on scroll (only active when the view adds .js) ---- */
+.js .home [data-reveal] {
+    opacity: 0;
+    transform: translateY(26px);
+    transition: opacity .9s var(--hm-ease), transform .9s var(--hm-ease);
+    transition-delay: var(--d, 0s);
+}
+
+.js .home [data-reveal].in {
+    opacity: 1;
+    transform: none;
+}
+
+/* Rows of the quote-list illustration slide in after the block appears */
+.js .home .hm-mock .hm-line {
+    opacity: 0;
+    transform: translateX(14px);
+    transition: opacity .6s var(--hm-ease), transform .6s var(--hm-ease), background-color .25s;
+    transition-delay: var(--d, 0s), var(--d, 0s), 0s;
+}
+
+.js .home [data-reveal].in .hm-mock .hm-line {
+    opacity: 1;
+    transform: none;
+}
+
+@keyframes hmRise {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: none; }
+}
+
+@keyframes hmDash {
+    to { stroke-dashoffset: -18; }
+}
+
+@keyframes hmPulse {
+    from { transform: scale(1); opacity: .35; }
+    to   { transform: scale(2.6); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .home *,
+    .home *::before,
+    .home *::after {
+        animation: none !important;
+        transition: none !important;
+    }
+
+    .hm-tilt,
+    .hm-tilt-r {
+        transform: none;
+    }
 }

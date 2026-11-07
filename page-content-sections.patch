@@ -1,0 +1,899 @@
+diff --git a/app/Http/Controllers/Admin/BlogController.php b/app/Http/Controllers/Admin/BlogController.php
+index 3c39b31..a04f831 100644
+--- a/app/Http/Controllers/Admin/BlogController.php
++++ b/app/Http/Controllers/Admin/BlogController.php
+@@ -5,6 +5,8 @@
+ use App\Http\Controllers\Controller;
+ use App\Models\Blog;
+ use App\Models\BlogCategory;
++use App\Models\Brand;
++use App\Models\Category;
+ use Illuminate\Http\RedirectResponse;
+ use Illuminate\Http\Request;
+ use Illuminate\Support\Facades\Auth;
+@@ -27,6 +29,8 @@ public function create(): View
+         return view('admin.blog.form', [
+             'post' => new Blog(),
+             'categories' => BlogCategory::orderBy('name')->get(),
++            'shopCategories' => Category::with('parent')->orderBy('name')->get(),
++            'brands' => Brand::orderBy('name')->get(),
+         ]);
+     }
+ 
+@@ -35,12 +39,15 @@ public function store(Request $request): RedirectResponse
+         $data = $this->validated($request);
+         $data['slug'] = $data['slug'] ?: Str::slug($data['title']);
+         $data['author_id'] = Auth::id();
++        [$categoryIds, $brandIds] = $this->extractPageLinks($data);
+ 
+         if ($request->hasFile('featured_image')) {
+             $data['featured_image'] = $request->file('featured_image')->store('blog', 'public');
+         }
+ 
+-        Blog::create($data);
++        $post = Blog::create($data);
++        $post->productCategories()->sync($categoryIds);
++        $post->brands()->sync($brandIds);
+ 
+         return redirect()->route('admin.blog.index')->with('status', 'Post created.');
+     }
+@@ -48,8 +55,10 @@ public function store(Request $request): RedirectResponse
+     public function edit(Blog $post): View
+     {
+         return view('admin.blog.form', [
+-            'post' => $post,
++            'post' => $post->load(['productCategories', 'brands']),
+             'categories' => BlogCategory::orderBy('name')->get(),
++            'shopCategories' => Category::with('parent')->orderBy('name')->get(),
++            'brands' => Brand::orderBy('name')->get(),
+         ]);
+     }
+ 
+@@ -57,6 +66,7 @@ public function update(Request $request, Blog $post): RedirectResponse
+     {
+         $data = $this->validated($request);
+         $data['slug'] = $data['slug'] ?: Str::slug($data['title']);
++        [$categoryIds, $brandIds] = $this->extractPageLinks($data);
+ 
+         if ($request->hasFile('featured_image')) {
+             if ($post->featured_image) {
+@@ -66,6 +76,8 @@ public function update(Request $request, Blog $post): RedirectResponse
+         }
+ 
+         $post->update($data);
++        $post->productCategories()->sync($categoryIds);
++        $post->brands()->sync($brandIds);
+ 
+         return redirect()->route('admin.blog.index')->with('status', 'Post updated.');
+     }
+@@ -94,6 +106,20 @@ protected function validated(Request $request): array
+             'published_at' => ['nullable', 'date'],
+             'meta_title' => ['nullable', 'string', 'max:255'],
+             'meta_description' => ['nullable', 'string', 'max:500'],
++            'category_ids' => ['nullable', 'array'],
++            'category_ids.*' => ['integer', 'exists:categories,id'],
++            'brand_ids' => ['nullable', 'array'],
++            'brand_ids.*' => ['integer', 'exists:brands,id'],
+         ]);
+     }
++
++    /** Pull the category/brand ids out of the validated data so only real columns reach create()/update(). */
++    protected function extractPageLinks(array &$data): array
++    {
++        $categoryIds = $data['category_ids'] ?? [];
++        $brandIds = $data['brand_ids'] ?? [];
++        unset($data['category_ids'], $data['brand_ids']);
++
++        return [$categoryIds, $brandIds];
++    }
+ }
+diff --git a/app/Http/Controllers/Admin/FaqController.php b/app/Http/Controllers/Admin/FaqController.php
+index 1b59a0b..d96d283 100644
+--- a/app/Http/Controllers/Admin/FaqController.php
++++ b/app/Http/Controllers/Admin/FaqController.php
+@@ -3,6 +3,7 @@
+ namespace App\Http\Controllers\Admin;
+ 
+ use App\Http\Controllers\Controller;
++use App\Models\Brand;
+ use App\Models\Category;
+ use App\Models\Faq;
+ use Illuminate\Http\RedirectResponse;
+@@ -13,7 +14,7 @@ class FaqController extends Controller
+ {
+     public function index(Request $request): View
+     {
+-        $faqs = Faq::with('categories')
++        $faqs = Faq::with(['categories', 'brands'])
+             ->when($request->filled('category_id'), fn ($q) => $q->whereHas(
+                 'categories', fn ($c) => $c->where('categories.id', $request->integer('category_id'))
+             ))
+@@ -33,6 +34,7 @@ public function create(): View
+         return view('admin.faqs.form', [
+             'faq' => new Faq(),
+             'categories' => $this->categoryOptions(),
++            'brands' => $this->brandOptions(),
+         ]);
+     }
+ 
+@@ -40,21 +42,24 @@ public function store(Request $request): RedirectResponse
+     {
+         $data = $this->validated($request);
+         $categoryIds = $data['category_ids'] ?? [];
+-        unset($data['category_ids']);
++        $brandIds = $data['brand_ids'] ?? [];
++        unset($data['category_ids'], $data['brand_ids']);
+ 
+         $faq = Faq::create($data);
+         $faq->categories()->sync($categoryIds);
++        $faq->brands()->sync($brandIds);
+ 
+         return redirect()->route('admin.faqs.index')->with('status', 'FAQ created.');
+     }
+ 
+     public function edit(Faq $faq): View
+     {
+-        $faq->load('categories');
++        $faq->load(['categories', 'brands']);
+ 
+         return view('admin.faqs.form', [
+             'faq' => $faq,
+             'categories' => $this->categoryOptions(),
++            'brands' => $this->brandOptions(),
+         ]);
+     }
+ 
+@@ -62,10 +67,12 @@ public function update(Request $request, Faq $faq): RedirectResponse
+     {
+         $data = $this->validated($request);
+         $categoryIds = $data['category_ids'] ?? [];
+-        unset($data['category_ids']);
++        $brandIds = $data['brand_ids'] ?? [];
++        unset($data['category_ids'], $data['brand_ids']);
+ 
+         $faq->update($data);
+         $faq->categories()->sync($categoryIds);
++        $faq->brands()->sync($brandIds);
+ 
+         return redirect()->route('admin.faqs.index')->with('status', 'FAQ updated.');
+     }
+@@ -85,6 +92,8 @@ protected function validated(Request $request): array
+             'sort_order'     => ['nullable', 'integer', 'min:0'],
+             'category_ids'   => ['nullable', 'array'],
+             'category_ids.*' => ['integer', 'exists:categories,id'],
++            'brand_ids'      => ['nullable', 'array'],
++            'brand_ids.*'    => ['integer', 'exists:brands,id'],
+         ]);
+ 
+         $data['sort_order'] = $data['sort_order'] ?? 0;
+@@ -97,4 +106,9 @@ protected function categoryOptions()
+     {
+         return Category::with('parent')->orderBy('name')->get();
+     }
++
++    protected function brandOptions()
++    {
++        return Brand::orderBy('name')->get();
++    }
+ }
+\ No newline at end of file
+diff --git a/app/Http/Controllers/Frontend/BrandController.php b/app/Http/Controllers/Frontend/BrandController.php
+index b62387f..4cb7006 100644
+--- a/app/Http/Controllers/Frontend/BrandController.php
++++ b/app/Http/Controllers/Frontend/BrandController.php
+@@ -6,6 +6,7 @@
+ use App\Models\Brand;
+ use Illuminate\View\View;
+ use App\Models\Banner;
++use App\Models\Faq;
+ 
+ class BrandController extends Controller
+ {
+@@ -25,6 +26,16 @@ public function show(Brand $brand): View
+             ->orderBy('sort_order')
+             ->get();
+ 
+-        return view('frontend.brands.show', compact('brand', 'products', 'topBanners'));
++        // Below-the-products content, all managed in the admin.
++        $blogs = $brand->blogs()
++            ->with('category')
++            ->where('blogs.status', true)
++            ->latest('blogs.published_at')
++            ->take(3)
++            ->get();
++
++        $faqs = Faq::forBrand($brand)->get();
++
++        return view('frontend.brands.show', compact('brand', 'products', 'topBanners', 'blogs', 'faqs'));
+     }
+ }
+diff --git a/app/Http/Controllers/Frontend/CategoryController.php b/app/Http/Controllers/Frontend/CategoryController.php
+index 430998e..a7e480d 100644
+--- a/app/Http/Controllers/Frontend/CategoryController.php
++++ b/app/Http/Controllers/Frontend/CategoryController.php
+@@ -5,6 +5,7 @@
+ use App\Http\Controllers\Controller;
+ use App\Models\Category;
+ use App\Models\Banner;
++use App\Models\Faq;
+ use Illuminate\View\View;
+ 
+ class CategoryController extends Controller
+@@ -30,7 +31,17 @@ public function show(Category $category): View
+             ->orderBy('sort_order')
+             ->get();
+ 
+-        return view('frontend.categories.show', compact('category', 'products', 'children', 'topBanners'));
++        // Below-the-products content, all managed in the admin.
++        $blogs = $category->blogs()
++            ->with('category')
++            ->where('blogs.status', true)
++            ->latest('blogs.published_at')
++            ->take(3)
++            ->get();
++
++        $faqs = Faq::forCategory($category)->get();
++
++        return view('frontend.categories.show', compact('category', 'products', 'children', 'topBanners', 'blogs', 'faqs'));
+ 
+     }
+ }
+diff --git a/app/Http/Requests/Admin/StoreBrandRequest.php b/app/Http/Requests/Admin/StoreBrandRequest.php
+index ac5162c..4a61772 100644
+--- a/app/Http/Requests/Admin/StoreBrandRequest.php
++++ b/app/Http/Requests/Admin/StoreBrandRequest.php
+@@ -19,6 +19,7 @@ public function rules(): array
+             'slug' => ['nullable', 'string', 'max:255', Rule::unique('brands', 'slug')],
+             'logo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,svg', 'max:1024'],
+             'description' => ['nullable', 'string'],
++            'seo_content' => ['nullable', 'string', 'max:65000'],
+             'website' => ['nullable', 'url', 'max:255'],
+             'meta_title' => ['nullable', 'string', 'max:255'],
+             'meta_description' => ['nullable', 'string', 'max:500'],
+diff --git a/app/Http/Requests/Admin/StoreCategoryRequest.php b/app/Http/Requests/Admin/StoreCategoryRequest.php
+index 04bf9c2..8c00c45 100644
+--- a/app/Http/Requests/Admin/StoreCategoryRequest.php
++++ b/app/Http/Requests/Admin/StoreCategoryRequest.php
+@@ -19,6 +19,7 @@ public function rules(): array
+             'name' => ['required', 'string', 'max:255'],
+             'slug' => ['nullable', 'string', 'max:255', Rule::unique('categories', 'slug')],
+             'description' => ['nullable', 'string'],
++            'seo_content' => ['nullable', 'string', 'max:65000'],
+             'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+             'icon' => ['nullable', 'string', 'max:60', 'regex:/^[a-z0-9\- ]+$/i'],
+             'meta_title' => ['nullable', 'string', 'max:255'],
+diff --git a/app/Http/Requests/Admin/UpdateBrandRequest.php b/app/Http/Requests/Admin/UpdateBrandRequest.php
+index da14de6..d4ad2a0 100644
+--- a/app/Http/Requests/Admin/UpdateBrandRequest.php
++++ b/app/Http/Requests/Admin/UpdateBrandRequest.php
+@@ -19,6 +19,7 @@ public function rules(): array
+             'slug' => ['nullable', 'string', 'max:255', Rule::unique('brands', 'slug')->ignore($this->route('brand'))],
+             'logo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,svg', 'max:1024'],
+             'description' => ['nullable', 'string'],
++            'seo_content' => ['nullable', 'string', 'max:65000'],
+             'website' => ['nullable', 'url', 'max:255'],
+             'meta_title' => ['nullable', 'string', 'max:255'],
+             'meta_description' => ['nullable', 'string', 'max:500'],
+diff --git a/app/Http/Requests/Admin/UpdateCategoryRequest.php b/app/Http/Requests/Admin/UpdateCategoryRequest.php
+index 3436dcc..172f6b9 100644
+--- a/app/Http/Requests/Admin/UpdateCategoryRequest.php
++++ b/app/Http/Requests/Admin/UpdateCategoryRequest.php
+@@ -23,6 +23,7 @@ public function rules(): array
+             'name' => ['required', 'string', 'max:255'],
+             'slug' => ['nullable', 'string', 'max:255', Rule::unique('categories', 'slug')->ignore($this->route('category'))],
+             'description' => ['nullable', 'string'],
++            'seo_content' => ['nullable', 'string', 'max:65000'],
+             'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+             'icon' => ['nullable', 'string', 'max:60', 'regex:/^[a-z0-9\- ]+$/i'],
+             'meta_title' => ['nullable', 'string', 'max:255'],
+diff --git a/app/Models/Blog.php b/app/Models/Blog.php
+index 24512d2..283d89a 100644
+--- a/app/Models/Blog.php
++++ b/app/Models/Blog.php
+@@ -5,6 +5,7 @@
+ use Illuminate\Database\Eloquent\Factories\HasFactory;
+ use Illuminate\Database\Eloquent\Model;
+ use Illuminate\Database\Eloquent\Relations\BelongsTo;
++use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+ 
+ class Blog extends Model
+ {
+@@ -32,4 +33,16 @@ public function author(): BelongsTo
+     {
+         return $this->belongsTo(User::class, 'author_id');
+     }
++
++    /** Shop categories whose page shows this post (not the blog's own category). */
++    public function productCategories(): BelongsToMany
++    {
++        return $this->belongsToMany(Category::class, 'category_blog');
++    }
++
++    /** Brands whose page shows this post. */
++    public function brands(): BelongsToMany
++    {
++        return $this->belongsToMany(Brand::class, 'brand_blog');
++    }
+ }
+diff --git a/app/Models/Brand.php b/app/Models/Brand.php
+index 9ad2ddd..e4d13e5 100644
+--- a/app/Models/Brand.php
++++ b/app/Models/Brand.php
+@@ -4,6 +4,7 @@
+ 
+ use Illuminate\Database\Eloquent\Factories\HasFactory;
+ use Illuminate\Database\Eloquent\Model;
++use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+ use Illuminate\Database\Eloquent\Relations\HasMany;
+ use App\Models\Concerns\LogsActivity;
+ 
+@@ -13,7 +14,7 @@ class Brand extends Model
+     use LogsActivity;
+ 
+     protected $fillable = [
+-        'name', 'slug', 'logo', 'description', 'website',
++        'name', 'slug', 'logo', 'description', 'seo_content', 'website',
+         'meta_title', 'meta_description', 'status', 'sort_order',
+     ];
+ 
+@@ -25,6 +26,16 @@ public function products(): HasMany
+     {
+         return $this->hasMany(Product::class);
+     }
++
++    public function faqs(): BelongsToMany
++    {
++        return $this->belongsToMany(Faq::class, 'brand_faq');
++    }
++
++    public function blogs(): BelongsToMany
++    {
++        return $this->belongsToMany(Blog::class, 'brand_blog');
++    }
+     
+     
+     protected array $frontendCacheKeys = ['nav.brands', 'homepage.data', 'sitemap.xml'];
+diff --git a/app/Models/Category.php b/app/Models/Category.php
+index 16772b7..9276945 100644
+--- a/app/Models/Category.php
++++ b/app/Models/Category.php
+@@ -5,6 +5,7 @@
+ use Illuminate\Database\Eloquent\Factories\HasFactory;
+ use Illuminate\Database\Eloquent\Model;
+ use Illuminate\Database\Eloquent\Relations\BelongsTo;
++use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+ use Illuminate\Database\Eloquent\Relations\HasMany;
+ use App\Models\Concerns\LogsActivity;
+ use App\Models\Concerns\BustsFrontendCache;
+@@ -18,7 +19,7 @@ class Category extends Model
+     protected array $frontendCacheKeys = ['nav.categories', 'nav.mega', 'homepage.data', 'sitemap.xml'];
+ 
+     protected $fillable = [
+-        'parent_id', 'name', 'slug', 'description', 'image',
++        'parent_id', 'name', 'slug', 'description', 'seo_content', 'image',
+         'meta_title', 'meta_description', 'status', 'sort_order','icon'
+     ];
+ 
+@@ -52,5 +53,15 @@ public function products(): HasMany
+     {
+         return $this->hasMany(Product::class);
+     }
++
++    public function faqs(): BelongsToMany
++    {
++        return $this->belongsToMany(Faq::class, 'category_faq');
++    }
++
++    public function blogs(): BelongsToMany
++    {
++        return $this->belongsToMany(Blog::class, 'category_blog');
++    }
+     
+ }
+diff --git a/app/Models/Faq.php b/app/Models/Faq.php
+index d231728..fbc86c9 100644
+--- a/app/Models/Faq.php
++++ b/app/Models/Faq.php
+@@ -17,6 +17,29 @@ public function categories(): BelongsToMany
+         return $this->belongsToMany(Category::class, 'category_faq');
+     }
+ 
++    public function brands(): BelongsToMany
++    {
++        return $this->belongsToMany(Brand::class, 'brand_faq');
++    }
++
++    /** Active FAQs ticked for this category (shown on the category page). */
++    public function scopeForCategory(Builder $query, Category $category): Builder
++    {
++        return $query->where('status', true)
++            ->whereHas('categories', fn ($c) => $c->where('categories.id', $category->id))
++            ->orderBy('sort_order')
++            ->orderBy('id');
++    }
++
++    /** Active FAQs ticked for this brand (shown on the brand page). */
++    public function scopeForBrand(Builder $query, Brand $brand): Builder
++    {
++        return $query->where('status', true)
++            ->whereHas('brands', fn ($b) => $b->where('brands.id', $brand->id))
++            ->orderBy('sort_order')
++            ->orderBy('id');
++    }
++
+     /**
+      * Active FAQs that are ticked for any of the product's categories.
+      * A FAQ with no categories ticked never matches. whereHas() returns each
+diff --git a/database/migrations/2026_11_07_000001_add_page_content_to_categories_and_brands.php b/database/migrations/2026_11_07_000001_add_page_content_to_categories_and_brands.php
+new file mode 100644
+index 0000000..eddc367
+--- /dev/null
++++ b/database/migrations/2026_11_07_000001_add_page_content_to_categories_and_brands.php
+@@ -0,0 +1,52 @@
++<?php
++
++use Illuminate\Database\Migrations\Migration;
++use Illuminate\Database\Schema\Blueprint;
++use Illuminate\Support\Facades\Schema;
++
++return new class extends Migration
++{
++    public function up(): void
++    {
++        // HTML block shown below the product cards on category / brand pages.
++        Schema::table('categories', function (Blueprint $table) {
++            $table->longText('seo_content')->nullable()->after('description');
++        });
++        Schema::table('brands', function (Blueprint $table) {
++            $table->longText('seo_content')->nullable()->after('description');
++        });
++
++        // FAQs for brand pages (category pages reuse the existing category_faq pivot).
++        Schema::create('brand_faq', function (Blueprint $table) {
++            $table->foreignId('faq_id')->constrained()->cascadeOnDelete();
++            $table->foreignId('brand_id')->constrained()->cascadeOnDelete();
++            $table->primary(['faq_id', 'brand_id']);
++        });
++
++        // Blog posts chosen for category / brand pages.
++        Schema::create('category_blog', function (Blueprint $table) {
++            $table->foreignId('blog_id')->constrained()->cascadeOnDelete();
++            $table->foreignId('category_id')->constrained()->cascadeOnDelete();
++            $table->primary(['blog_id', 'category_id']);
++        });
++        Schema::create('brand_blog', function (Blueprint $table) {
++            $table->foreignId('blog_id')->constrained()->cascadeOnDelete();
++            $table->foreignId('brand_id')->constrained()->cascadeOnDelete();
++            $table->primary(['blog_id', 'brand_id']);
++        });
++    }
++
++    public function down(): void
++    {
++        Schema::dropIfExists('brand_blog');
++        Schema::dropIfExists('category_blog');
++        Schema::dropIfExists('brand_faq');
++
++        Schema::table('brands', function (Blueprint $table) {
++            $table->dropColumn('seo_content');
++        });
++        Schema::table('categories', function (Blueprint $table) {
++            $table->dropColumn('seo_content');
++        });
++    }
++};
+diff --git a/resources/css/frontend.css b/resources/css/frontend.css
+index ff90470..151ffab 100644
+--- a/resources/css/frontend.css
++++ b/resources/css/frontend.css
+@@ -6,4 +6,5 @@
+ @import './frontend/contact.css';
+ @import './frontend/whatsapp.css';
+ @import './frontend/footer.css';
+-@import './frontend/product.css';
+\ No newline at end of file
++@import './frontend/product.css';
++@import './frontend/listing-extras.css';
+\ No newline at end of file
+diff --git a/resources/css/frontend/listing-extras.css b/resources/css/frontend/listing-extras.css
+new file mode 100644
+index 0000000..df1fd12
+--- /dev/null
++++ b/resources/css/frontend/listing-extras.css
+@@ -0,0 +1,39 @@
++/* ===== Category / brand page: content below the product cards ===== */
++.listing-seo {
++    color: #374151;
++    line-height: 1.8;
++}
++
++.listing-seo > :first-child { margin-top: 0; }
++
++.listing-seo h2 {
++    font-size: 1.5rem;
++    font-weight: 700;
++    letter-spacing: -.01em;
++    margin: 1.75rem 0 .75rem;
++    color: var(--ink);
++}
++
++.listing-seo h3 {
++    font-size: 1.2rem;
++    font-weight: 700;
++    margin: 1.5rem 0 .6rem;
++    color: var(--ink);
++}
++
++.listing-seo p { margin-bottom: 1rem; }
++
++.listing-seo ul,
++.listing-seo ol {
++    padding-left: 1.25rem;
++    margin-bottom: 1.25rem;
++}
++
++.listing-seo li { margin-bottom: .6rem; }
++
++.listing-seo a {
++    color: var(--brand-red);
++    text-decoration: none;
++}
++
++.listing-seo a:hover { text-decoration: underline; }
+diff --git a/resources/views/admin/blog/form.blade.php b/resources/views/admin/blog/form.blade.php
+index 7eb5ecf..fa7823a 100644
+--- a/resources/views/admin/blog/form.blade.php
++++ b/resources/views/admin/blog/form.blade.php
+@@ -56,6 +56,26 @@
+             </div>
+         </div>
+ 
++        <div class="card shadow-sm mb-3">
++            <div class="card-header bg-white fw-semibold">Show this post on category / brand pages</div>
++            <div class="card-body row g-3">
++                @include('admin.partials.tick-list', [
++                    'name' => 'category_ids',
++                    'title' => 'Categories',
++                    'items' => $shopCategories->map(fn ($c) => ['id' => $c->id, 'label' => ($c->parent ? $c->parent->name.' › ' : '').$c->name])->all(),
++                    'selected' => $post->productCategories->pluck('id')->all(),
++                    'help' => 'The post appears as a card under the products on each ticked category page (latest 3 published posts are shown).',
++                ])
++                @include('admin.partials.tick-list', [
++                    'name' => 'brand_ids',
++                    'title' => 'Brands',
++                    'items' => $brands->map(fn ($b) => ['id' => $b->id, 'label' => $b->name])->all(),
++                    'selected' => $post->brands->pluck('id')->all(),
++                    'help' => 'Same for brand pages. Only published posts are shown.',
++                ])
++            </div>
++        </div>
++
+         <div class="card shadow-sm mb-3">
+             <div class="card-header bg-white fw-semibold">SEO</div>
+             <div class="card-body row g-3">
+diff --git a/resources/views/admin/brands/form.blade.php b/resources/views/admin/brands/form.blade.php
+index b4476bc..9206e59 100644
+--- a/resources/views/admin/brands/form.blade.php
++++ b/resources/views/admin/brands/form.blade.php
+@@ -48,6 +48,19 @@
+             </div>
+         </div>
+ 
++        <div class="card shadow-sm mb-3">
++            <div class="card-header bg-white fw-semibold">Page content <span class="text-muted fw-normal small">(shown below the product cards)</span></div>
++            <div class="card-body">
++                <textarea name="seo_content" rows="14" class="form-control font-monospace" style="font-size:.85rem;"
++                          placeholder="&lt;p&gt;Intro paragraph...&lt;/p&gt;&#10;&lt;h2&gt;Why choose us?&lt;/h2&gt;&#10;&lt;ul&gt;&#10;  &lt;li&gt;...&lt;/li&gt;&#10;&lt;/ul&gt;">{{ old('seo_content', $brand->seo_content) }}</textarea>
++                <div class="form-text">
++                    HTML is allowed (p, h2, h3, ul, li, strong, a...). Leave empty to show nothing.
++                    FAQs are linked from <a href="{{ route('admin.faqs.index') }}">FAQs</a> and blog posts from the
++                    <a href="{{ route('admin.blog.index') }}">Blog</a> post form, by ticking this brand.
++                </div>
++            </div>
++        </div>
++
+         <div class="card shadow-sm mb-3">
+             <div class="card-header bg-white fw-semibold">SEO</div>
+             <div class="card-body row g-3">
+diff --git a/resources/views/admin/categories/form.blade.php b/resources/views/admin/categories/form.blade.php
+index 80268df..d75ed14 100644
+--- a/resources/views/admin/categories/form.blade.php
++++ b/resources/views/admin/categories/form.blade.php
+@@ -72,6 +72,19 @@ class="form-control" placeholder="e.g. bi-laptop">
+             </div>
+         </div>
+ 
++        <div class="card shadow-sm mb-3">
++            <div class="card-header bg-white fw-semibold">Page content <span class="text-muted fw-normal small">(shown below the product cards)</span></div>
++            <div class="card-body">
++                <textarea name="seo_content" rows="14" class="form-control font-monospace" style="font-size:.85rem;"
++                          placeholder="&lt;p&gt;Intro paragraph...&lt;/p&gt;&#10;&lt;h2&gt;Why choose us?&lt;/h2&gt;&#10;&lt;ul&gt;&#10;  &lt;li&gt;...&lt;/li&gt;&#10;&lt;/ul&gt;">{{ old('seo_content', $category->seo_content) }}</textarea>
++                <div class="form-text">
++                    HTML is allowed (p, h2, h3, ul, li, strong, a...). Leave empty to show nothing.
++                    FAQs are linked from <a href="{{ route('admin.faqs.index') }}">FAQs</a> and blog posts from the
++                    <a href="{{ route('admin.blog.index') }}">Blog</a> post form, by ticking this category.
++                </div>
++            </div>
++        </div>
++
+         <div class="card shadow-sm mb-3">
+             <div class="card-header bg-white fw-semibold">SEO</div>
+             <div class="card-body row g-3">
+diff --git a/resources/views/admin/faqs/form.blade.php b/resources/views/admin/faqs/form.blade.php
+index 25f5a61..c238eed 100644
+--- a/resources/views/admin/faqs/form.blade.php
++++ b/resources/views/admin/faqs/form.blade.php
+@@ -31,45 +31,25 @@
+                     </div>
+                 </div>
+ 
+-                <div class="col-12">
+-                    <label class="form-label fw-semibold">Show on products in these categories</label>
+-                    <div class="border rounded p-2">
+-                        <div class="form-check border-bottom pb-2 mb-2">
+-                            <input type="checkbox" class="form-check-input" id="catAll">
+-                            <label class="form-check-label fw-semibold" for="catAll">Select all</label>
+-                        </div>
+-                        <div class="row" style="max-height:260px; overflow:auto;">
+-                            @php $selected = old('category_ids', $faq->categories->pluck('id')->all()); @endphp
+-                            @foreach($categories as $cat)
+-                                <div class="col-md-4 col-sm-6">
+-                                    <div class="form-check">
+-                                        <input type="checkbox" class="form-check-input cat-item" name="category_ids[]"
+-                                               value="{{ $cat->id }}" id="cat{{ $cat->id }}" @checked(in_array($cat->id, $selected))>
+-                                        <label class="form-check-label" for="cat{{ $cat->id }}">
+-                                            {{ $cat->parent ? $cat->parent->name.' › ' : '' }}{{ $cat->name }}
+-                                        </label>
+-                                    </div>
+-                                </div>
+-                            @endforeach
+-                        </div>
+-                    </div>
+-                    <div class="form-text">The FAQ appears only on products in the ticked categories. If none are ticked, it is not shown anywhere.</div>
+-                </div>
++                @include('admin.partials.tick-list', [
++                    'name' => 'category_ids',
++                    'title' => 'Show on these categories (category page and its products)',
++                    'items' => $categories->map(fn ($c) => ['id' => $c->id, 'label' => ($c->parent ? $c->parent->name.' › ' : '').$c->name])->all(),
++                    'selected' => $faq->categories->pluck('id')->all(),
++                    'help' => 'The FAQ appears on the ticked category pages and on the products inside them.',
++                ])
++
++                @include('admin.partials.tick-list', [
++                    'name' => 'brand_ids',
++                    'title' => 'Show on these brand pages',
++                    'items' => $brands->map(fn ($b) => ['id' => $b->id, 'label' => $b->name])->all(),
++                    'selected' => $faq->brands->pluck('id')->all(),
++                    'help' => 'The FAQ appears on the ticked brand pages. If nothing is ticked anywhere, it is not shown.',
++                ])
+             </div>
+         </div>
+ 
+         <button class="btn btn-primary">Save FAQ</button>
+         <a href="{{ route('admin.faqs.index') }}" class="btn btn-outline-secondary">Cancel</a>
+     </form>
+-
+-    <script>
+-        document.addEventListener('DOMContentLoaded', function () {
+-            const all = document.getElementById('catAll');
+-            const items = document.querySelectorAll('.cat-item');
+-            const sync = () => { all.checked = items.length > 0 && [...items].every(i => i.checked); };
+-            all.addEventListener('change', () => items.forEach(i => i.checked = all.checked));
+-            items.forEach(i => i.addEventListener('change', sync));
+-            sync();
+-        });
+-    </script>
+ @endsection
+\ No newline at end of file
+diff --git a/resources/views/admin/faqs/index.blade.php b/resources/views/admin/faqs/index.blade.php
+index ceeffe8..8d9abfb 100644
+--- a/resources/views/admin/faqs/index.blade.php
++++ b/resources/views/admin/faqs/index.blade.php
+@@ -22,7 +22,7 @@
+     <div class="card shadow-sm">
+         <table class="table table-hover mb-0 align-middle">
+             <thead class="table-light">
+-                <tr><th>Question</th><th>Shown on categories</th><th>Order</th><th>Status</th><th class="text-end">Actions</th></tr>
++                <tr><th>Question</th><th>Shown on</th><th>Order</th><th>Status</th><th class="text-end">Actions</th></tr>
+             </thead>
+             <tbody>
+                 @forelse($faqs as $faq)
+@@ -32,11 +32,17 @@
+                             <div class="text-muted small">{{ \Illuminate\Support\Str::limit($faq->answer, 80) }}</div>
+                         </td>
+                         <td class="small">
+-                            @if($faq->categories->isEmpty())
++                            @if($faq->categories->isEmpty() && $faq->brands->isEmpty())
+                                 <span class="text-danger">None selected (not shown)</span>
+                             @else
+-                                {{ $faq->categories->take(3)->pluck('name')->implode(', ') }}
+-                                @if($faq->categories->count() > 3) <span class="text-muted">+{{ $faq->categories->count() - 3 }} more</span> @endif
++                                @if($faq->categories->isNotEmpty())
++                                    <div>{{ $faq->categories->take(3)->pluck('name')->implode(', ') }}
++                                    @if($faq->categories->count() > 3) <span class="text-muted">+{{ $faq->categories->count() - 3 }} more</span> @endif</div>
++                                @endif
++                                @if($faq->brands->isNotEmpty())
++                                    <div class="text-muted">Brands: {{ $faq->brands->take(3)->pluck('name')->implode(', ') }}
++                                    @if($faq->brands->count() > 3) +{{ $faq->brands->count() - 3 }} more @endif</div>
++                                @endif
+                             @endif
+                         </td>
+                         <td>{{ $faq->sort_order }}</td>
+diff --git a/resources/views/admin/partials/tick-list.blade.php b/resources/views/admin/partials/tick-list.blade.php
+new file mode 100644
+index 0000000..20bf4e3
+--- /dev/null
++++ b/resources/views/admin/partials/tick-list.blade.php
+@@ -0,0 +1,43 @@
++{{--
++    Checkbox list with "Select all".
++    Expects: $name (input name without []), $title, $items (array of ['id' => .., 'label' => ..]),
++             $selected (array of ids), optional $help
++--}}
++@php
++    $uid = 'tick_'.$name;
++    $selectedIds = array_map('intval', (array) old($name, $selected ?? []));
++@endphp
++<div class="col-12">
++    <label class="form-label fw-semibold">{{ $title }}</label>
++    <div class="border rounded p-2" id="{{ $uid }}">
++        <div class="form-check border-bottom pb-2 mb-2">
++            <input type="checkbox" class="form-check-input" id="{{ $uid }}_all" data-tick-all>
++            <label class="form-check-label fw-semibold" for="{{ $uid }}_all">Select all</label>
++        </div>
++        <div class="row" style="max-height:260px; overflow:auto;">
++            @forelse($items as $item)
++                <div class="col-md-4 col-sm-6">
++                    <div class="form-check">
++                        <input type="checkbox" class="form-check-input" data-tick-item name="{{ $name }}[]"
++                               value="{{ $item['id'] }}" id="{{ $uid }}_{{ $item['id'] }}" @checked(in_array((int) $item['id'], $selectedIds, true))>
++                        <label class="form-check-label" for="{{ $uid }}_{{ $item['id'] }}">{{ $item['label'] }}</label>
++                    </div>
++                </div>
++            @empty
++                <div class="col-12 text-muted small">Nothing to choose from yet.</div>
++            @endforelse
++        </div>
++    </div>
++    @isset($help)<div class="form-text">{{ $help }}</div>@endisset
++</div>
++<script>
++    (function () {
++        const box = document.getElementById(@json($uid));
++        const all = box.querySelector('[data-tick-all]');
++        const items = box.querySelectorAll('[data-tick-item]');
++        const sync = () => { all.checked = items.length > 0 && [...items].every(i => i.checked); };
++        all.addEventListener('change', () => items.forEach(i => i.checked = all.checked));
++        items.forEach(i => i.addEventListener('change', sync));
++        sync();
++    })();
++</script>
+diff --git a/resources/views/frontend/brands/show.blade.php b/resources/views/frontend/brands/show.blade.php
+index 1bb5443..e2707cd 100644
+--- a/resources/views/frontend/brands/show.blade.php
++++ b/resources/views/frontend/brands/show.blade.php
+@@ -32,5 +32,14 @@
+     @else
+         <p class="text-muted py-5 text-center">No products from this brand yet.</p>
+     @endif
++
++    @if($products->currentPage() === 1)
++        @include('frontend.partials.listing-extras', [
++            'name' => $brand->name,
++            'seoContent' => $brand->seo_content,
++            'blogs' => $blogs,
++            'faqs' => $faqs,
++        ])
++    @endif
+ </div>
+ @endsection
+diff --git a/resources/views/frontend/categories/show.blade.php b/resources/views/frontend/categories/show.blade.php
+index 6357e8f..6ae75b1 100644
+--- a/resources/views/frontend/categories/show.blade.php
++++ b/resources/views/frontend/categories/show.blade.php
+@@ -80,5 +80,14 @@ class="img-fluid w-100 d-block"
+     @else
+         <p class="text-muted py-5 text-center">No products in this category yet.</p>
+     @endif
++
++    @if($products->currentPage() === 1)
++        @include('frontend.partials.listing-extras', [
++            'name' => $category->name,
++            'seoContent' => $category->seo_content,
++            'blogs' => $blogs,
++            'faqs' => $faqs,
++        ])
++    @endif
+ </div>
+ @endsection
+diff --git a/resources/views/frontend/partials/listing-extras.blade.php b/resources/views/frontend/partials/listing-extras.blade.php
+new file mode 100644
+index 0000000..a7be054
+--- /dev/null
++++ b/resources/views/frontend/partials/listing-extras.blade.php
+@@ -0,0 +1,85 @@
++{{--
++    Content shown BELOW the product cards on category and brand pages:
++      1. admin-written HTML block   ($seoContent)
++      2. blog cards                 ($blogs)
++      3. FAQ accordion              ($faqs)
++    Each part is skipped when it has nothing to show.
++    Expects: $name, $seoContent, $blogs, $faqs
++--}}
++@php
++    $seoContent = trim((string) ($seoContent ?? ''));
++    $blogs = $blogs ?? collect();
++    $faqs = $faqs ?? collect();
++@endphp
++
++@if($seoContent !== '')
++    <section class="listing-seo mt-5">
++        {{-- Written by an admin in the admin panel, so it is output as HTML on purpose. --}}
++        {!! $seoContent !!}
++    </section>
++@endif
++
++@if($blogs->isNotEmpty())
++    <section class="listing-blogs mt-5">
++        <div class="d-flex flex-wrap align-items-end justify-content-between gap-2 mb-4">
++            <div>
++                <div class="section-eyebrow">Blog</div>
++                <h2 class="section-title mb-0">Latest articles on {{ $name }}</h2>
++            </div>
++            <a href="{{ route('blog.index') }}" class="btn btn-outline-brand btn-sm">View all articles</a>
++        </div>
++        <div class="row g-4">
++            @foreach($blogs as $post)
++                <div class="col-md-6 col-lg-4">
++                    @include('frontend.partials.blog-card', ['post' => $post])
++                </div>
++            @endforeach
++        </div>
++    </section>
++@endif
++
++@if($faqs->isNotEmpty())
++    <section class="listing-faq mt-5">
++        <div class="row g-4 g-lg-5">
++            <div class="col-lg-4">
++                <div class="pd-faq-aside">
++                    <div class="section-eyebrow">FAQ</div>
++                    <h2 class="section-title">Frequently asked questions</h2>
++                    <p class="mt-2">Can't find what you are looking for? Send us a message and our team will get back to you.</p>
++                    <a href="{{ route('contact.create') }}" class="btn btn-outline-brand">Contact us</a>
++                </div>
++            </div>
++
++            <div class="col-lg-8">
++                <div class="accordion faq-accordion" id="listingFaqAccordion">
++                    @foreach($faqs as $faq)
++                        <div class="accordion-item">
++                            <h3 class="accordion-header">
++                                <button class="accordion-button {{ $loop->first ? '' : 'collapsed' }}" type="button"
++                                        data-bs-toggle="collapse" data-bs-target="#listingFaq{{ $faq->id }}"
++                                        aria-expanded="{{ $loop->first ? 'true' : 'false' }}" aria-controls="listingFaq{{ $faq->id }}">
++                                    {{ $faq->question }}
++                                </button>
++                            </h3>
++                            <div id="listingFaq{{ $faq->id }}" class="accordion-collapse collapse {{ $loop->first ? 'show' : '' }}" data-bs-parent="#listingFaqAccordion">
++                                <div class="accordion-body">{!! nl2br(e($faq->answer)) !!}</div>
++                            </div>
++                        </div>
++                    @endforeach
++                </div>
++            </div>
++        </div>
++
++        <script type="application/ld+json">
++            {!! json_encode([
++                '@context' => 'https://schema.org',
++                '@type' => 'FAQPage',
++                'mainEntity' => $faqs->map(fn ($f) => [
++                    '@type' => 'Question',
++                    'name' => $f->question,
++                    'acceptedAnswer' => ['@type' => 'Answer', 'text' => $f->answer],
++                ])->values(),
++            ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}
++        </script>
++    </section>
++@endif

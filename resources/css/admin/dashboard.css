@@ -4,10 +4,10 @@
      border-radius: 18px;
      padding: 1.75rem 2rem;
      color: #fff;
-     background: linear-gradient(135deg, #15171a 0%, #23272c 55%, #3a0a14 100%);
+     background: #030000;
  }
 
- .dash-hero::after {
+ /* .dash-hero::after {
      content: "";
      position: absolute;
      right: -80px;
@@ -17,7 +17,7 @@
      border-radius: 50%;
      background: radial-gradient(circle, rgba(228, 0, 43, .5), transparent 65%);
      pointer-events: none;
- }
+ } */
 
  .dash-hero>* {
      position: relative;

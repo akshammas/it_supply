@@ -1,4 +1,15 @@
-public function run(): void
-{
-    // Intentionally empty. Never create default accounts here.
-}
+<?php
+
+namespace Database\Seeders;
+
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Database\Seeder;
+
+
+   class DatabaseSeeder extends Seeder
+   {
+       public function run(): void
+       {
+           // Intentionally empty. Never create default accounts here.
+       }
+   }
