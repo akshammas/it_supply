@@ -83,7 +83,7 @@ class BannerController extends Controller
             'title'         => ['nullable', 'string', 'max:255'],
             'subtitle'      => ['nullable', 'string', 'max:255'],
             'image'         => [$required ? 'required' : 'nullable', 'image', 'max:2048'],
-            'link_url'      => ['nullable', 'string', 'max:500'],
+            'link_url'      => ['nullable', 'string', 'max:500', 'regex:/^(\/(?!\/)|https?:\/\/|mailto:|tel:|#)/i'],
             'button_text'   => ['nullable', 'string', 'max:100'],
             'position'      => ['required', 'string', 'in:home_hero,home_promo,category_top,brand_top'],
             'sort_order'    => ['nullable', 'integer', 'min:0'],

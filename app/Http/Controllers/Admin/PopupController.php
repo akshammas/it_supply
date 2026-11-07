@@ -103,7 +103,7 @@ class PopupController extends Controller
             'body'           => ['nullable', 'string', 'max:1000'],
             'image'          => [$needsImage ? 'required' : 'nullable', 'image', 'max:2048'],
             'button_text'    => ['nullable', 'string', 'max:100'],
-            'button_url'     => ['nullable', 'string', 'max:500'],
+            'button_url'     => ['nullable', 'string', 'max:500', 'regex:/^(\/(?!\/)|https?:\/\/|mailto:|tel:|#)/i'],
             'trigger'        => ['required', Rule::in(array_keys(Popup::TRIGGERS))],
             'trigger_delay'  => ['nullable', 'integer', 'min:0', 'max:120'],
             'trigger_scroll' => ['nullable', 'integer', 'min:5', 'max:100'],
@@ -117,7 +117,7 @@ class PopupController extends Controller
             'form_button_text' => ['nullable', 'string', 'max:60'],
             'success_message'  => ['nullable', 'string', 'max:255'],
             'consent_text'     => ['nullable', 'string', 'max:255'],
-            'privacy_url'      => ['nullable', 'string', 'max:255'],
+            'privacy_url'      => ['nullable', 'string', 'max:255', 'regex:/^(\/(?!\/)|https?:\/\/|mailto:|tel:|#)/i'],
         ], [
             'image.required'        => 'Upload an image for an Image only popup.',
             'custom_paths.required_if' => 'Enter at least one page path for Custom pages.',

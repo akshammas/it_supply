@@ -20,9 +20,9 @@
 
         <div class="carousel-inner">
             @foreach($banners as $b)
-                @php $tag = $b->link_url ? 'a href='.e($b->link_url) : 'div'; @endphp
+                @php $isLink = filled($b->link_url); @endphp
                 <div class="carousel-item {{ $loop->first ? 'active' : '' }}">
-                    <{!! $tag !!} class="d-block position-relative text-decoration-none">
+                   @if($isLink)<a href="{{ $b->link_url }}" class="d-block position-relative text-decoration-none">@else<div class="d-block position-relative">@endif
                         <img src="{{ Storage::url($b->image) }}" alt="{{ $b->title ?? 'Banner' }}"
                              class="img-fluid w-100 d-block" width="{{ $w }}" height="{{ $h }}"
                              style="aspect-ratio: {{ $w }} / {{ $h }};" decoding="async">
@@ -33,7 +33,7 @@
                                 @if($b->subtitle)<div class="small opacity-75">{{ $b->subtitle }}</div>@endif
                             </div>
                         @endif
-                    </{!! explode(' ', $tag)[0] !!}>
+                    @if($isLink)</a>@else</div>@endif
                 </div>
             @endforeach
         </div>

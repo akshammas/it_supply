@@ -209,6 +209,8 @@
                         msg = Object.values(r.json.errors)[0][0];
                     } else if (r.res.status === 429) {
                         msg = 'Too many attempts. Please try again in a minute.';
+                    } else if (r.res.status === 419) {
+                        msg = 'Your session expired. Please refresh the page and try again.';
                     }
                     errorBox.textContent = msg;
                     btn.disabled = false;

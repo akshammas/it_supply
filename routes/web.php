@@ -34,21 +34,21 @@ Route::get('/products/{product:slug}', [ProductController::class, 'show'])->name
 Route::get('/categories/{category:slug}', [CategoryController::class, 'show'])->name('categories.show');
 Route::get('/brands/{brand:slug}', [BrandController::class, 'show'])->name('brands.show');
 
-Route::get('/search', [SearchController::class, 'index'])->name('search');
+Route::get('/search', [SearchController::class, 'index'])->middleware('throttle:60,1')->name('search');
 
 
 
 Route::get('/enquiry', [EnquiryCartController::class, 'index'])->name('enquiry.index');
-Route::post('/enquiry/add/{product}', [EnquiryCartController::class, 'add'])->name('enquiry.add');
+Route::post('/enquiry/add/{product}', [EnquiryCartController::class, 'add'])->middleware('throttle:30,1')->name('enquiry.add');
 Route::post('/enquiry/update/{product}', [EnquiryCartController::class, 'update'])->name('enquiry.update');
 Route::delete('/enquiry/remove/{product}', [EnquiryCartController::class, 'remove'])->name('enquiry.remove');
 
 Route::get('/request-quote', [QuoteRequestController::class, 'create'])->name('quote-request.create');
-Route::post('/request-quote', [QuoteRequestController::class, 'store'])->name('quote-request.store');
+Route::post('/request-quote', [QuoteRequestController::class, 'store'])->middleware('throttle:5,1')->name('quote-request.store');
 Route::get('/thank-you', [QuoteRequestController::class, 'thankYou'])->name('quote-request.thank-you');
 
 Route::get('/contact', [ContactController::class, 'create'])->name('contact.create');
-Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
+Route::post('/contact', [ContactController::class, 'store'])->middleware('throttle:5,1')->name('contact.store');
 
 Route::post('/popup-lead', [PopupLeadController::class, 'store'])->middleware('throttle:5,1')->name('popup-lead.store');
 

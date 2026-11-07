@@ -8,7 +8,6 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Page;
 use App\Models\Product;
-use App\Models\Solution;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cache;
 
@@ -29,7 +28,6 @@ class SitemapController extends Controller
 
             $urls->push(['loc' => route('home'), 'lastmod' => now(), 'priority' => '1.0']);
             $urls->push(['loc' => route('products.index'), 'lastmod' => now(), 'priority' => '0.9']);
-            $urls->push(['loc' => route('solutions.index'), 'lastmod' => now(), 'priority' => '0.7']);
             $urls->push(['loc' => route('blog.index'), 'lastmod' => now(), 'priority' => '0.6']);
 
             Product::where('status', true)->select('slug', 'updated_at')->cursor()->each(function ($product) use ($urls) {
@@ -42,10 +40,6 @@ class SitemapController extends Controller
 
             Brand::where('status', true)->select('slug', 'updated_at')->cursor()->each(function ($brand) use ($urls) {
                 $urls->push(['loc' => route('brands.show', $brand), 'lastmod' => $brand->updated_at, 'priority' => '0.6']);
-            });
-
-            Solution::where('status', true)->select('slug', 'updated_at')->cursor()->each(function ($solution) use ($urls) {
-                $urls->push(['loc' => route('solutions.show', $solution), 'lastmod' => $solution->updated_at, 'priority' => '0.6']);
             });
 
             Blog::where('status', true)->select('slug', 'updated_at')->cursor()->each(function ($post) use ($urls) {

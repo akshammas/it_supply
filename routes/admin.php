@@ -11,9 +11,7 @@ use App\Http\Controllers\Admin\EnquiryController;
 use App\Http\Controllers\Admin\ImportController;
 use App\Http\Controllers\Admin\PageController;
 use App\Http\Controllers\Admin\ProductController;
-use App\Http\Controllers\Admin\QuoteController;
 use App\Http\Controllers\Admin\SettingController;
-use App\Http\Controllers\Admin\SolutionController;
 use App\Http\Controllers\Admin\SpecificationController;
 use App\Http\Controllers\Admin\SpecificationGroupController;
 use Illuminate\Support\Facades\Route;
@@ -75,16 +73,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('enquiries', [EnquiryController::class, 'index'])->name('enquiries.index');
         Route::get('enquiries/{enquiry}', [EnquiryController::class, 'show'])->name('enquiries.show');
         Route::put('enquiries/{enquiry}/status', [EnquiryController::class, 'updateStatus'])->name('enquiries.status');
-        Route::post('enquiries/{enquiry}/create-quote', [QuoteController::class, 'createFromEnquiry'])->name('quotes.create-from-enquiry');
-
-        Route::get('quotes', [QuoteController::class, 'index'])->name('quotes.index');
-        Route::get('quotes/{quote}', [QuoteController::class, 'show'])->name('quotes.show');
-        Route::get('quotes/{quote}/edit', [QuoteController::class, 'edit'])->name('quotes.edit');
-        Route::put('quotes/{quote}', [QuoteController::class, 'update'])->name('quotes.update');
-        Route::put('quotes/{quote}/status', [QuoteController::class, 'updateStatus'])->name('quotes.status');
-        Route::get('quotes/{quote}/pdf', [QuoteController::class, 'pdf'])->name('quotes.pdf');
-
-        Route::resource('solutions', SolutionController::class)->except('show');
 
         Route::resource('blog', BlogController::class)->except('show')->parameters(['blog' => 'post']);
         Route::post('blog-categories', [BlogCategoryController::class, 'store'])->name('blog-categories.store');

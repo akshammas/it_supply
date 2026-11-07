@@ -6,7 +6,7 @@
     <title>@yield('title', 'Admin') | {{ config('app.name') }}</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
     @include('frontend.partials.favicon')
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['resources/css/app.css', 'resources/css/admin.css', 'resources/js/app.js'])
 
     @php
         $siteName = \App\Models\Setting::get('company_name') ?: config('app.name');
@@ -30,7 +30,6 @@
             'Sales' => [
                 ['Enquiries', 'bi-envelope', 'admin.enquiries.index', ['admin.enquiries.*'], $newEnquiries],
                 ['Popup Leads', 'bi-person-lines-fill', 'admin.popup-leads.index', ['admin.popup-leads.*']],
-                ['Quotes', 'bi-file-earmark-text', 'admin.quotes.index', ['admin.quotes.*']],
                 ['Customers', 'bi-people', null,['Popup Leads', 'bi-person-lines-fill', 'admin.popup-leads.index', ['admin.popup-leads.*']], []],
             ],
             'Content' => [
@@ -47,7 +46,7 @@
         ];
     @endphp
 
-    <@vite(['resources/css/app.css', 'resources/css/admin.css', 'resources/js/app.js'])
+ 
     
 </head>
 <body class="admin-body">

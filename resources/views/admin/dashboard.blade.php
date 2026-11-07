@@ -14,7 +14,6 @@
         ['Brands',       $stats['brands'],        'bi-award',             'admin.brands.index',     'teal'],
         ['Enquiries',    $stats['enquiries'],     'bi-envelope',          'admin.enquiries.index',  'slate'],
         ['New enquiries',$stats['new_enquiries'], 'bi-bell',              'admin.enquiries.index',  'red'],
-        ['Quotes',       $stats['quotes'],        'bi-file-earmark-text', 'admin.quotes.index',     'amber'],
     ];
     $chartMax = max(1, $chart->max('count'));
 @endphp
