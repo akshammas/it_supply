@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Frontend;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Banner;
+use App\Models\Faq;
 use Illuminate\View\View;
 
 class CategoryController extends Controller
@@ -30,7 +31,17 @@ class CategoryController extends Controller
             ->orderBy('sort_order')
             ->get();
 
-        return view('frontend.categories.show', compact('category', 'products', 'children', 'topBanners'));
+        // Below-the-products content, all managed in the admin.
+        $blogs = $category->blogs()
+            ->with('category')
+            ->where('blogs.status', true)
+            ->latest('blogs.published_at')
+            ->take(3)
+            ->get();
+
+        $faqs = Faq::forCategory($category)->get();
+
+        return view('frontend.categories.show', compact('category', 'products', 'children', 'topBanners', 'blogs', 'faqs'));
 
     }
 }

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Brand;
 use Illuminate\View\View;
 use App\Models\Banner;
+use App\Models\Faq;
 
 class BrandController extends Controller
 {
@@ -25,6 +26,16 @@ class BrandController extends Controller
             ->orderBy('sort_order')
             ->get();
 
-        return view('frontend.brands.show', compact('brand', 'products', 'topBanners'));
+        // Below-the-products content, all managed in the admin.
+        $blogs = $brand->blogs()
+            ->with('category')
+            ->where('blogs.status', true)
+            ->latest('blogs.published_at')
+            ->take(3)
+            ->get();
+
+        $faqs = Faq::forBrand($brand)->get();
+
+        return view('frontend.brands.show', compact('brand', 'products', 'topBanners', 'blogs', 'faqs'));
     }
 }

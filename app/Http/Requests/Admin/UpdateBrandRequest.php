@@ -19,6 +19,7 @@ class UpdateBrandRequest extends FormRequest
             'slug' => ['nullable', 'string', 'max:255', Rule::unique('brands', 'slug')->ignore($this->route('brand'))],
             'logo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,svg', 'max:1024'],
             'description' => ['nullable', 'string'],
+            'seo_content' => ['nullable', 'string', 'max:65000'],
             'website' => ['nullable', 'url', 'max:255'],
             'meta_title' => ['nullable', 'string', 'max:255'],
             'meta_description' => ['nullable', 'string', 'max:500'],

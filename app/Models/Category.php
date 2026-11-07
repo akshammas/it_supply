@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\Concerns\LogsActivity;
 use App\Models\Concerns\BustsFrontendCache;
@@ -18,7 +19,7 @@ class Category extends Model
     protected array $frontendCacheKeys = ['nav.categories', 'nav.mega', 'homepage.data', 'sitemap.xml'];
 
     protected $fillable = [
-        'parent_id', 'name', 'slug', 'description', 'image',
+        'parent_id', 'name', 'slug', 'description', 'seo_content', 'image',
         'meta_title', 'meta_description', 'status', 'sort_order','icon'
     ];
 
@@ -51,6 +52,16 @@ class Category extends Model
     public function products(): HasMany
     {
         return $this->hasMany(Product::class);
+    }
+
+    public function faqs(): BelongsToMany
+    {
+        return $this->belongsToMany(Faq::class, 'category_faq');
+    }
+
+    public function blogs(): BelongsToMany
+    {
+        return $this->belongsToMany(Blog::class, 'category_blog');
     }
     
 }

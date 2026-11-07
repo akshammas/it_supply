@@ -57,6 +57,26 @@
         </div>
 
         <div class="card shadow-sm mb-3">
+            <div class="card-header bg-white fw-semibold">Show this post on category / brand pages</div>
+            <div class="card-body row g-3">
+                @include('admin.partials.tick-list', [
+                    'name' => 'category_ids',
+                    'title' => 'Categories',
+                    'items' => $shopCategories->map(fn ($c) => ['id' => $c->id, 'label' => ($c->parent ? $c->parent->name.' › ' : '').$c->name])->all(),
+                    'selected' => $post->productCategories->pluck('id')->all(),
+                    'help' => 'The post appears as a card under the products on each ticked category page (latest 3 published posts are shown).',
+                ])
+                @include('admin.partials.tick-list', [
+                    'name' => 'brand_ids',
+                    'title' => 'Brands',
+                    'items' => $brands->map(fn ($b) => ['id' => $b->id, 'label' => $b->name])->all(),
+                    'selected' => $post->brands->pluck('id')->all(),
+                    'help' => 'Same for brand pages. Only published posts are shown.',
+                ])
+            </div>
+        </div>
+
+        <div class="card shadow-sm mb-3">
             <div class="card-header bg-white fw-semibold">SEO</div>
             <div class="card-body row g-3">
                 <div class="col-md-6">

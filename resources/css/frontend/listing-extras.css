@@ -1,0 +1,92 @@
+/* ===== Category / brand page: content below the product cards ===== */
+.listing-seo {
+    color: #374151;
+    line-height: 1.8;
+}
+
+.listing-seo > :first-child { margin-top: 0; }
+
+.listing-seo h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -.01em;
+    margin: 1.75rem 0 .75rem;
+    color: var(--ink);
+}
+
+.listing-seo h3 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin: 1.5rem 0 .6rem;
+    color: var(--ink);
+}
+
+.listing-seo p { margin-bottom: 1rem; }
+
+.listing-seo ul,
+.listing-seo ol {
+    padding-left: 1.25rem;
+    margin-bottom: 1.25rem;
+}
+
+.listing-seo li { margin-bottom: .6rem; }
+
+.listing-seo a {
+    color: var(--brand-red);
+    text-decoration: none;
+}
+
+.listing-seo a:hover { text-decoration: underline; }
+
+/* ===== "Need a quotation?" band (bottom of category / brand pages) ===== */
+.quote-cta {
+    background: var(--brand-red-light);
+    padding: 3.5rem 0;
+    margin-top: 3rem;
+}
+
+.quote-cta h2 {
+    font-weight: 800;
+    font-size: 1.8rem;
+    letter-spacing: -.01em;
+    margin-bottom: .75rem;
+}
+
+.quote-cta p { color: var(--muted); }
+
+.quote-cta .contact-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 1rem;
+}
+
+.quote-cta .contact-list li {
+    display: flex;
+    align-items: center;
+    gap: .9rem;
+}
+
+.quote-cta .contact-list i {
+    flex: 0 0 44px;
+    width: 44px;
+    height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #fff;
+    color: var(--brand-red);
+    font-size: 1.15rem;
+    box-shadow: 0 4px 12px rgba(16, 24, 40, .08);
+}
+
+.quote-cta .contact-list a,
+.quote-cta .contact-list span {
+    color: var(--ink);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.quote-cta .contact-list a:hover { color: var(--brand-red); }

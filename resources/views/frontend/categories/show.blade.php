@@ -80,5 +80,16 @@
     @else
         <p class="text-muted py-5 text-center">No products in this category yet.</p>
     @endif
+
+    @if($products->currentPage() === 1)
+        @include('frontend.partials.listing-extras', [
+            'name' => $category->name,
+            'seoContent' => $category->seo_content,
+            'blogs' => $blogs,
+            'faqs' => $faqs,
+        ])
+    @endif
 </div>
+
+@include('frontend.partials.quote-cta')
 @endsection

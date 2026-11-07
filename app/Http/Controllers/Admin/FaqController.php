@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Faq;
 use Illuminate\Http\RedirectResponse;
@@ -13,7 +14,7 @@ class FaqController extends Controller
 {
     public function index(Request $request): View
     {
-        $faqs = Faq::with('categories')
+        $faqs = Faq::with(['categories', 'brands'])
             ->when($request->filled('category_id'), fn ($q) => $q->whereHas(
                 'categories', fn ($c) => $c->where('categories.id', $request->integer('category_id'))
             ))
@@ -33,6 +34,7 @@ class FaqController extends Controller
         return view('admin.faqs.form', [
             'faq' => new Faq(),
             'categories' => $this->categoryOptions(),
+            'brands' => $this->brandOptions(),
         ]);
     }
 
@@ -40,21 +42,24 @@ class FaqController extends Controller
     {
         $data = $this->validated($request);
         $categoryIds = $data['category_ids'] ?? [];
-        unset($data['category_ids']);
+        $brandIds = $data['brand_ids'] ?? [];
+        unset($data['category_ids'], $data['brand_ids']);
 
         $faq = Faq::create($data);
         $faq->categories()->sync($categoryIds);
+        $faq->brands()->sync($brandIds);
 
         return redirect()->route('admin.faqs.index')->with('status', 'FAQ created.');
     }
 
     public function edit(Faq $faq): View
     {
-        $faq->load('categories');
+        $faq->load(['categories', 'brands']);
 
         return view('admin.faqs.form', [
             'faq' => $faq,
             'categories' => $this->categoryOptions(),
+            'brands' => $this->brandOptions(),
         ]);
     }
 
@@ -62,10 +67,12 @@ class FaqController extends Controller
     {
         $data = $this->validated($request);
         $categoryIds = $data['category_ids'] ?? [];
-        unset($data['category_ids']);
+        $brandIds = $data['brand_ids'] ?? [];
+        unset($data['category_ids'], $data['brand_ids']);
 
         $faq->update($data);
         $faq->categories()->sync($categoryIds);
+        $faq->brands()->sync($brandIds);
 
         return redirect()->route('admin.faqs.index')->with('status', 'FAQ updated.');
     }
@@ -85,6 +92,8 @@ class FaqController extends Controller
             'sort_order'     => ['nullable', 'integer', 'min:0'],
             'category_ids'   => ['nullable', 'array'],
             'category_ids.*' => ['integer', 'exists:categories,id'],
+            'brand_ids'      => ['nullable', 'array'],
+            'brand_ids.*'    => ['integer', 'exists:brands,id'],
         ]);
 
         $data['sort_order'] = $data['sort_order'] ?? 0;
@@ -96,5 +105,10 @@ class FaqController extends Controller
     protected function categoryOptions()
     {
         return Category::with('parent')->orderBy('name')->get();
+    }
+
+    protected function brandOptions()
+    {
+        return Brand::orderBy('name')->get();
     }
 }

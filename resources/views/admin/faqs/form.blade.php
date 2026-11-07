@@ -31,45 +31,25 @@
                     </div>
                 </div>
 
-                <div class="col-12">
-                    <label class="form-label fw-semibold">Show on products in these categories</label>
-                    <div class="border rounded p-2">
-                        <div class="form-check border-bottom pb-2 mb-2">
-                            <input type="checkbox" class="form-check-input" id="catAll">
-                            <label class="form-check-label fw-semibold" for="catAll">Select all</label>
-                        </div>
-                        <div class="row" style="max-height:260px; overflow:auto;">
-                            @php $selected = old('category_ids', $faq->categories->pluck('id')->all()); @endphp
-                            @foreach($categories as $cat)
-                                <div class="col-md-4 col-sm-6">
-                                    <div class="form-check">
-                                        <input type="checkbox" class="form-check-input cat-item" name="category_ids[]"
-                                               value="{{ $cat->id }}" id="cat{{ $cat->id }}" @checked(in_array($cat->id, $selected))>
-                                        <label class="form-check-label" for="cat{{ $cat->id }}">
-                                            {{ $cat->parent ? $cat->parent->name.' › ' : '' }}{{ $cat->name }}
-                                        </label>
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-                    </div>
-                    <div class="form-text">The FAQ appears only on products in the ticked categories. If none are ticked, it is not shown anywhere.</div>
-                </div>
+                @include('admin.partials.tick-list', [
+                    'name' => 'category_ids',
+                    'title' => 'Show on these categories (category page and its products)',
+                    'items' => $categories->map(fn ($c) => ['id' => $c->id, 'label' => ($c->parent ? $c->parent->name.' › ' : '').$c->name])->all(),
+                    'selected' => $faq->categories->pluck('id')->all(),
+                    'help' => 'The FAQ appears on the ticked category pages and on the products inside them.',
+                ])
+
+                @include('admin.partials.tick-list', [
+                    'name' => 'brand_ids',
+                    'title' => 'Show on these brand pages',
+                    'items' => $brands->map(fn ($b) => ['id' => $b->id, 'label' => $b->name])->all(),
+                    'selected' => $faq->brands->pluck('id')->all(),
+                    'help' => 'The FAQ appears on the ticked brand pages. If nothing is ticked anywhere, it is not shown.',
+                ])
             </div>
         </div>
 
         <button class="btn btn-primary">Save FAQ</button>
         <a href="{{ route('admin.faqs.index') }}" class="btn btn-outline-secondary">Cancel</a>
     </form>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const all = document.getElementById('catAll');
-            const items = document.querySelectorAll('.cat-item');
-            const sync = () => { all.checked = items.length > 0 && [...items].every(i => i.checked); };
-            all.addEventListener('change', () => items.forEach(i => i.checked = all.checked));
-            items.forEach(i => i.addEventListener('change', sync));
-            sync();
-        });
-    </script>
 @endsection

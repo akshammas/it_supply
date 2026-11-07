@@ -49,6 +49,19 @@
         </div>
 
         <div class="card shadow-sm mb-3">
+            <div class="card-header bg-white fw-semibold">Page content <span class="text-muted fw-normal small">(shown below the product cards)</span></div>
+            <div class="card-body">
+                <textarea name="seo_content" rows="14" class="form-control font-monospace" style="font-size:.85rem;"
+                          placeholder="Buy Servers in UAE: HPE, Dell &amp; Lenovo&#10;Intro paragraph about the products...&#10;Why Choose Us?&#10;* Authorized Distributor: Genuine products with full warranty.&#10;* Fast Delivery: Quick shipping across the UAE.">{{ old('seo_content', $brand->seo_content) }}</textarea>
+                <div class="form-text">
+                    Paste plain text or HTML. In plain text, a short line with no full stop at the end becomes a heading, lines starting with <code>*</code> become bullets (the text before the first colon is made bold), and <code>[text](https://...)</code> makes a link. If the text contains HTML tags it is shown exactly as written. Leave empty to show nothing.
+                    FAQs are linked from <a href="{{ route('admin.faqs.index') }}">FAQs</a> and blog posts from the
+                    <a href="{{ route('admin.blog.index') }}">Blog</a> post form, by ticking this brand.
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm mb-3">
             <div class="card-header bg-white fw-semibold">SEO</div>
             <div class="card-body row g-3">
                 <div class="col-md-6">

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Blog extends Model
 {
@@ -31,5 +32,17 @@ class Blog extends Model
     public function author(): BelongsTo
     {
         return $this->belongsTo(User::class, 'author_id');
+    }
+
+    /** Shop categories whose page shows this post (not the blog's own category). */
+    public function productCategories(): BelongsToMany
+    {
+        return $this->belongsToMany(Category::class, 'category_blog');
+    }
+
+    /** Brands whose page shows this post. */
+    public function brands(): BelongsToMany
+    {
+        return $this->belongsToMany(Brand::class, 'brand_blog');
     }
 }

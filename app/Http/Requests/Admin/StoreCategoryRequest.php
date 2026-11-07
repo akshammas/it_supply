@@ -19,6 +19,7 @@ class StoreCategoryRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'slug' => ['nullable', 'string', 'max:255', Rule::unique('categories', 'slug')],
             'description' => ['nullable', 'string'],
+            'seo_content' => ['nullable', 'string', 'max:65000'],
             'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             'icon' => ['nullable', 'string', 'max:60', 'regex:/^[a-z0-9\- ]+$/i'],
             'meta_title' => ['nullable', 'string', 'max:255'],

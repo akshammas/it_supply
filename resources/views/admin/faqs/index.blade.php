@@ -22,7 +22,7 @@
     <div class="card shadow-sm">
         <table class="table table-hover mb-0 align-middle">
             <thead class="table-light">
-                <tr><th>Question</th><th>Shown on categories</th><th>Order</th><th>Status</th><th class="text-end">Actions</th></tr>
+                <tr><th>Question</th><th>Shown on</th><th>Order</th><th>Status</th><th class="text-end">Actions</th></tr>
             </thead>
             <tbody>
                 @forelse($faqs as $faq)
@@ -32,11 +32,17 @@
                             <div class="text-muted small">{{ \Illuminate\Support\Str::limit($faq->answer, 80) }}</div>
                         </td>
                         <td class="small">
-                            @if($faq->categories->isEmpty())
+                            @if($faq->categories->isEmpty() && $faq->brands->isEmpty())
                                 <span class="text-danger">None selected (not shown)</span>
                             @else
-                                {{ $faq->categories->take(3)->pluck('name')->implode(', ') }}
-                                @if($faq->categories->count() > 3) <span class="text-muted">+{{ $faq->categories->count() - 3 }} more</span> @endif
+                                @if($faq->categories->isNotEmpty())
+                                    <div>{{ $faq->categories->take(3)->pluck('name')->implode(', ') }}
+                                    @if($faq->categories->count() > 3) <span class="text-muted">+{{ $faq->categories->count() - 3 }} more</span> @endif</div>
+                                @endif
+                                @if($faq->brands->isNotEmpty())
+                                    <div class="text-muted">Brands: {{ $faq->brands->take(3)->pluck('name')->implode(', ') }}
+                                    @if($faq->brands->count() > 3) +{{ $faq->brands->count() - 3 }} more @endif</div>
+                                @endif
                             @endif
                         </td>
                         <td>{{ $faq->sort_order }}</td>
