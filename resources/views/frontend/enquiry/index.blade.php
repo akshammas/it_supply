@@ -56,7 +56,7 @@
             <a href="{{ route('quote-request.create') }}" class="btn btn-primary btn-lg">
                 <i class="bi bi-file-earmark-text me-1"></i> Request Quote
             </a>
-            <a href="https://wa.me/{{ config('services.whatsapp.number', '971500000000') }}?text={{ urlencode($whatsappMessage) }}"
+            <a href="https://wa.me/{{ config('services.whatsapp.number', '+971506557172') }}?text={{ urlencode($whatsappMessage) }}"
                target="_blank" class="btn btn-success btn-lg">
                 <i class="bi bi-whatsapp me-1"></i> WhatsApp
             </a>
