@@ -752,7 +752,6 @@
     right: -10rem;
     top: -14rem;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(228, 0, 43, .26), transparent 65%);
     pointer-events: none;
 }
 
@@ -843,5 +842,46 @@
     .hm-tilt,
     .hm-tilt-r {
         transform: none;
+    }
+}
+
+/* =====================================================================
+   Animated grid on the home page's dark areas
+   Same pattern as the About hero (.hero::before). Append to your home CSS.
+   Add the class "hm-grid" to any dark section to use it.
+   ===================================================================== */
+
+.hm-grid {
+    position: relative;
+    isolation: isolate;   /* keeps the grid above the section background, below its content */
+    overflow: hidden;
+}
+
+.hm-grid::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image:
+        linear-gradient(rgba(255, 255, 255, .045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, .045) 1px, transparent 1px);
+    background-size: 52px 52px;
+    -webkit-mask-image: radial-gradient(ellipse 70% 80% at var(--hm-mask, 70% 30%), #000, transparent 75%);
+    mask-image: radial-gradient(ellipse 70% 80% at var(--hm-mask, 70% 30%), #000, transparent 75%);
+    animation: hmDrift 50s linear infinite;
+}
+
+/* Where the grid fades, per section (the numbers band is short, so it is centred) */
+.hm-stats.hm-grid { --hm-mask: 50% 50%; }
+.hm-cta.hm-grid   { --hm-mask: 30% 40%; }
+
+@keyframes hmDrift {
+    to { background-position: 52px 52px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hm-grid::before {
+        animation: none;
     }
 }

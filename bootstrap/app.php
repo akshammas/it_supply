@@ -15,10 +15,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        // if (env('TRUST_PROXIES', false)) {
-        //     $middleware->trustProxies(at: '*');
-        // }
-        $middleware->trustProxies(at: '*');
+        if (env('TRUST_PROXIES', false)) {
+            $middleware->trustProxies(at: '*');
+        }
+        // $middleware->trustProxies(at: '*');
         $middleware->alias([
             'admin' => EnsureUserIsAdmin::class,
             'role' => EnsureRole::class,
@@ -31,7 +31,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // literally named "login", which this app doesn't have, and
         // throws a RouteNotFoundException instead of redirecting.
         $middleware->redirectGuestsTo(fn () => route('admin.login'));
-        // $middleware->append(SecurityHeaders::class);
+        $middleware->append(SecurityHeaders::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         // An expired session mid-form-submit throws a CSRF token

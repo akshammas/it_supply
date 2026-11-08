@@ -115,7 +115,7 @@
     @yield('content')
 </main>
 
-<footer class="site-footer py-5 mt-5">
+<footer class="site-footer py-5 mt-5 hm-grid">
     <div class="container">
         <div class="row g-4">
             <div class="col-md-4">

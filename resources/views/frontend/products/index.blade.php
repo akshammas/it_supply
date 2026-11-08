@@ -34,13 +34,6 @@
                         <option value="preorder" @selected(request('stock_status')==='preorder')>Pre-order</option>
                     </select>
 
-                    <label class="form-label small text-uppercase text-muted">Pricing</label>
-                    <select name="price_type" class="form-select mb-3" onchange="this.form.submit()">
-                        <option value="">Any</option>
-                        <option value="fixed" @selected(request('price_type')==='fixed')>Fixed Price</option>
-                        <option value="sale" @selected(request('price_type')==='sale')>On Sale</option>
-                        <option value="on_request" @selected(request('price_type')==='on_request')>Price on Request</option>
-                    </select>
 
                     <a href="{{ url()->current() }}" class="btn btn-sm btn-outline-secondary w-100">Clear Filters</a>
                 </div>

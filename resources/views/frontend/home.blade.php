@@ -417,7 +417,7 @@
     </section>
 
     {{-- WHO WE SUPPLY --}}
-    <section class="hm-sec hm-dark">
+    <section class="hm-sec hm-dark hm-grid">
         <div class="container">
             <div class="hm-head" data-reveal>
                 <h2 class="hm-h2">IT supply for companies, government bodies and resellers</h2>
@@ -481,7 +481,7 @@
     </section>
 
     {{-- CTA BAND --}}
-    <section class="hm-cta">
+    <section class="hm-cta hm-grid">
         <div class="container">
             <div class="row g-5 align-items-center">
                 <div class="col-lg-7" data-reveal>
