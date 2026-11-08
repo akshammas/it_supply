@@ -9,7 +9,7 @@
         default    => ['Out of stock', 'bad'],
     };
 
-    $waNumber = preg_replace('/\D+/', '', \App\Models\Setting::get('whatsapp_number', '971500000000'));
+    $waNumber = preg_replace('/\D+/', '', \App\Models\Setting::get('whatsapp_number', '971506557172'));
     $waLink   = 'https://wa.me/'.$waNumber.'?text='.urlencode($product->whatsappMessage());
 @endphp
 

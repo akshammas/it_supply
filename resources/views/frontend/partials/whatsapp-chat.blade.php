@@ -1,6 +1,6 @@
 @php
     // Digits only, so "+971 50 123 4567" in Settings still works
-    $waNumber   = preg_replace('/\D/', '', \App\Models\Setting::get('whatsapp_number', '971500000000'));
+    $waNumber   = preg_replace('/\D/', '', \App\Models\Setting::get('whatsapp_number', '+971506557172'));
     $waCompany  = \App\Models\Setting::get('company_name', config('app.name'));
     $waGreeting = \App\Models\Setting::get('whatsapp_greeting', 'Hello! 👋 How can we help you today?');
     $waLogo     = \App\Models\Setting::get('logo');
