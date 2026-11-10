@@ -203,10 +203,22 @@
 .hero-fill .lead { font-size: clamp(.95rem, 1.6vw, 1.15rem); }
 .hero-fill .btn-lg { padding: .6rem 1.4rem; font-size: 1rem; }
 
-.promo-strip img {
-    height: calc((100svh - var(--header-h, 76px)) * 0.5 - 2rem);
-    min-height: 140px;
-    max-height: 260px;
+/* Desktop: fit the promo banners into the lower half of the first screen */
+@media (min-width: 992px) {
+    .promo-strip img {
+        height: calc((100svh - var(--header-h, 76px)) * 0.5 - 2rem);
+        min-height: 140px;
+        max-height: 260px;
+    }
+}
+
+/* Phone and tablet: show the whole banner at its natural shape, no cropping */
+@media (max-width: 991.98px) {
+    .promo-strip img {
+        height: auto;
+        max-height: none;
+        min-height: 0;
+    }
 }
 
 /* =====================================================================

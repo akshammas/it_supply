@@ -171,9 +171,7 @@
 
 @section('content')
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&display=swap">
+
 
 <script>
     // Scroll-reveal styles only apply when this runs and motion is allowed.
@@ -351,7 +349,7 @@
     </section>
 
     {{-- Who we supply --}}
-    <section class="sec dark">
+    <section class="sec dark  hm-grid">
         <div class="container">
             <div class="sec-head" data-reveal>
                 <h2>Who we supply</h2>

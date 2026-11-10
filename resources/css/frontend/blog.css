@@ -93,7 +93,7 @@
     right: -11rem;
     top: -15rem;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(228, 0, 43, .24), transparent 65%);
+
     pointer-events: none;
 }
 

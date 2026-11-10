@@ -106,9 +106,6 @@
 
 @section('content')
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&display=swap">
 
 <script>
     // Scroll-reveal styles only apply when this runs and motion is allowed.
@@ -417,7 +414,7 @@
     </section>
 
     {{-- WHO WE SUPPLY --}}
-    <section class="hm-sec hm-dark hm-grid">
+    <section class="hm-sec dark hm-grid">
         <div class="container">
             <div class="hm-head" data-reveal>
                 <h2 class="hm-h2">IT supply for companies, government bodies and resellers</h2>
@@ -481,7 +478,7 @@
     </section>
 
     {{-- CTA BAND --}}
-    <section class="hm-cta hm-grid">
+    <section class="hm-cta dark hm-grid">
         <div class="container">
             <div class="row g-5 align-items-center">
                 <div class="col-lg-7" data-reveal>
