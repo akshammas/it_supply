@@ -19,19 +19,28 @@ class QuoteRequestController extends Controller
     {
     }
 
-    public function create(): View|RedirectResponse
+        /**
+     * Every "Request a Quote" button points here. The quote now goes through the
+     * contact page; the products in the enquiry list are carried over there.
+     */
+    public function create(): RedirectResponse
     {
-        if ($this->cart->isEmpty()) {
-            return redirect()->route('products.index')
-                ->with('status', 'Add a product to your enquiry list first, then request a quote.');
-        }
-
-        return view('frontend.quote-request.create', [
-            'items'          => $this->cart->items(),
-            'defaultSubject' => $this->cart->quoteSubject(),
-            'defaultMessage' => $this->cart->quoteMessage(),
-        ]);
+        return redirect(route('contact.create', ['type' => 'quote']).'#contact-form');
     }
+
+    // public function create(): View|RedirectResponse
+    // {
+    //     if ($this->cart->isEmpty()) {
+    //         return redirect()->route('products.index')
+    //             ->with('status', 'Add a product to your enquiry list first, then request a quote.');
+    //     }
+
+    //     return view('frontend.quote-request.create', [
+    //         'items'          => $this->cart->items(),
+    //         'defaultSubject' => $this->cart->quoteSubject(),
+    //         'defaultMessage' => $this->cart->quoteMessage(),
+    //     ]);
+    // }
 
     public function store(StoreQuoteRequestRequest $request): RedirectResponse
     {

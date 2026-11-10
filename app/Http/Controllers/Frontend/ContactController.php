@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Frontend\StoreContactRequest;
 use App\Mail\NewEnquiryReceived;
 use App\Models\Enquiry;
+use App\Services\EnquiryCartService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\View\View;
 
@@ -18,10 +20,21 @@ use Illuminate\View\View;
  */
 class ContactController extends Controller
 {
-    public function create(): View
+    public function __construct(protected EnquiryCartService $cart)
     {
+    }
+
+    public function create(Request $request): View
+    {
+        // Arriving from a "Request a Quote" button: preselect the topic and,
+        // if the visitor picked products, list them in the message.
+        $fromQuote = $request->query('type') === 'quote';
+
         return view('frontend.contact.create', [
-            'enquiryTypes' => StoreContactRequest::ENQUIRY_TYPES,
+            'enquiryTypes'   => StoreContactRequest::ENQUIRY_TYPES,
+            'fromQuote'      => $fromQuote,
+            'prefillType'    => $fromQuote ? 'Price / quotation' : null,
+            'prefillMessage' => $fromQuote && ! $this->cart->isEmpty() ? $this->cart->quoteMessage() : null,
         ]);
     }
 
@@ -43,6 +56,18 @@ class ContactController extends Controller
             'message' => $message,
             'status' => 'new',
         ]);
+
+        // Quote requests keep their product list, so the admin sees the items as before.
+        if ($request->boolean('from_quote') && ! $this->cart->isEmpty()) {
+            foreach ($this->cart->items() as $item) {
+                $enquiry->items()->create([
+                    'product_id' => $item['product']->id,
+                    'quantity'   => $item['quantity'],
+                ]);
+            }
+            $this->cart->clear();
+            $enquiry->load('items.product');
+        }
 
         $adminEmail = config('mail.admin_address');
         if ($adminEmail) {

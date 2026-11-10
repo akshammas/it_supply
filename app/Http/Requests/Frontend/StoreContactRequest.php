@@ -29,7 +29,8 @@ class StoreContactRequest extends FormRequest
             'email' => ['required', 'email', 'max:255'],
             'phone' => ['nullable', 'string', 'max:30'],
             'enquiry_type' => ['nullable', Rule::in(self::ENQUIRY_TYPES)],
-            'message' => ['required', 'string', 'max:2000'],
+            'message' => ['required', 'string', 'max:5000'],
+            'from_quote' => ['nullable', 'boolean'],
         ];
     }
 

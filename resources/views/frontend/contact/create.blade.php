@@ -207,6 +207,9 @@
 
                     <form method="POST" action="{{ route('contact.store') }}" id="contactForm">
                         @csrf
+                        @if(!empty($fromQuote) || old('from_quote'))
+                            <input type="hidden" name="from_quote" value="1">
+                        @endif
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <div class="form-floating">
@@ -245,7 +248,7 @@
                                     <select name="enquiry_type" id="cType" class="form-select @error('enquiry_type') is-invalid @enderror">
                                         <option value="">Select a topic</option>
                                         @foreach($enquiryTypes as $type)
-                                            <option value="{{ $type }}" @selected(old('enquiry_type') === $type)>{{ $type }}</option>
+                                            <option value="{{ $type }}" @selected(old('enquiry_type', $prefillType ?? null) === $type)>{{ $type }}</option>
                                         @endforeach
                                     </select>
                                     <label for="cType">What is your enquiry about?</label>
@@ -255,7 +258,7 @@
                             <div class="col-12">
                                 <div class="form-floating">
                                     <textarea name="message" id="cMessage" placeholder="Message" style="height:160px;"
-                                              class="form-control @error('message') is-invalid @enderror" required>{{ old('message') }}</textarea>
+                                              class="form-control @error('message') is-invalid @enderror" required>{{ old('message', $prefillMessage ?? '') }}</textarea>
                                     <label for="cMessage">Your message *</label>
                                     @error('message')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                 </div>
@@ -274,9 +277,9 @@
                     <div class="contact-side-title">Need prices fast?</div>
                     <p>Pick your products and send us a quotation request in a couple of minutes.</p>
                     <div class="d-grid gap-2">
-                        <a href="{{ route('quote-request.create') }}" class="btn btn-brand"><i class="bi bi-receipt me-2"></i>Request a Quote</a>
+                        <!-- <a href="{{ route('quote-request.create') }}" class="btn btn-brand"><i class="bi bi-receipt me-2"></i>Request a Quote</a> -->
                         @if($waLink)
-                            <a href="{{ $waLink }}" target="_blank" rel="noopener" class="btn btn-outline-light"><i class="bi bi-whatsapp me-2"></i>Chat on WhatsApp</a>
+                            <a href="{{ $waLink }}" target="_blank" rel="noopener" class="btn btn-brand "><i class="bi bi-whatsapp me-2"></i>Chat on WhatsApp</a>
                         @endif
                     </div>
                 </div>

@@ -311,7 +311,7 @@
                                 <span class="hm-qty"><span>−</span><b>{{ $mockQty[$i] ?? 1 }}</b><span>+</span></span>
                             </div>
                         @endforeach
-                        <div class="hm-mock-foot"><span>Example quote list</span><span class="hm-fakebtn">Request a quote</span></div>
+                        <div class="hm-mock-foot"><span>Example quote list</span><a href="{{ route('enquiry.index') }}" class="hm-fakebtn text-decoration-none text-white btn-brand btn-lg">Request a quote</a></div>
                     </figure>
                 </div>
             </div>

@@ -1,6 +1,7 @@
 /* ---- Header ---- */
 .site-header {
     border-bottom: 1px solid #eee;
+    box-shadow: 0 1px 0 rgba(11, 16, 23, .06), 0 10px 24px -14px rgba(11, 16, 23, .28);
 }
 
 .brand-logo {
