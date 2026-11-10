@@ -1,6 +1,10 @@
 @extends('frontend.layouts.app')
 @section('title', 'Your Enquiry List | '.config('app.name'))
 
+@php
+    $waNumber = preg_replace('/\D+/', '', (string) \App\Models\Setting::get('whatsapp_number', ''));
+@endphp
+
 @section('content')
 <div class="container py-4">
     <h2 class="mb-4">Your Enquiry List</h2>
@@ -52,14 +56,17 @@
             </table>
         </div>
 
+
         <div class="d-flex flex-wrap gap-2">
             <a href="{{ route('quote-request.create') }}" class="btn btn-primary btn-lg">
                 <i class="bi bi-file-earmark-text me-1"></i> Request Quote
             </a>
-            <a href="https://wa.me/{{ config('services.whatsapp.number', '+971506557172') }}?text={{ urlencode($whatsappMessage) }}"
-               target="_blank" class="btn btn-success btn-lg">
-                <i class="bi bi-whatsapp me-1"></i> WhatsApp
-            </a>
+            @if($waNumber)
+                <a href="https://wa.me/{{ $waNumber }}?text={{ urlencode($whatsappMessage) }}"
+                target="_blank" rel="noopener" class="btn btn-success btn-lg">
+                    <i class="bi bi-whatsapp me-1"></i> WhatsApp
+                </a>
+            @endif
             <a href="{{ route('products.index') }}" class="btn btn-outline-secondary btn-lg">Continue Browsing</a>
         </div>
     @endif
