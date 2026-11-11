@@ -57,7 +57,7 @@
 
             <article class="blog-content">
                 @if($isHtml)
-                    {!! $content !!}
+                    {!! \App\Support\SafeHtml::clean($content) !!}
                 @else
                     @foreach(array_filter(preg_split('/\R{2,}/', trim($content))) as $para)
                         <p>{!! nl2br(e($para)) !!}</p>

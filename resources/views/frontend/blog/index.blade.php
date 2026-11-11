@@ -73,7 +73,7 @@
 <div class="blog-page">
 
     {{-- Header --}}
-    <section class="blog-hero">
+    <section class="blog-hero dark">
         <div class="container bl-in">
             <nav class="bl-crumbs" aria-label="Breadcrumb" style="--i:0">
                 <a href="{{ url('/') }}">Home</a> / <a href="{{ route('blog.index') }}">Blog</a>@if($activeCat) / {{ $activeCat->name }}@endif
@@ -165,7 +165,7 @@
     </section>
 
     {{-- CTA --}}
-    <section class="bl-cta">
+    <section class="bl-cta dark">
         <div class="container">
             <div class="row align-items-center g-4">
                 <div class="col-lg-8" data-reveal>

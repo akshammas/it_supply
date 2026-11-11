@@ -38,7 +38,7 @@ class UserController extends Controller
             'name'     => ['required', 'string', 'max:255'],
             'email'    => ['required', 'email', 'max:255', 'unique:users,email'],
             'role'     => ['required', Rule::in(array_keys(User::ROLES))],
-            'password' => ['required', 'confirmed', Password::min(8)],
+            'password' => ['required', 'confirmed', Password::min(12)->letters()->numbers()],
         ]);
 
         $user = new User([

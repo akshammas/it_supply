@@ -25,7 +25,7 @@ class PageContent
 
         // Written by an admin, so real HTML is passed through untouched.
         if (preg_match('/<\s*(p|h[1-6]|ul|ol|li|div|section|table|a|strong|em|br)[\s>\/]/i', $content)) {
-            return $content;
+            return SafeHtml::clean($content);;
         }
 
         // Plain-text mode: raw HTML is stripped and unsafe link schemes are blocked.

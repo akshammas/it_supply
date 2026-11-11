@@ -405,3 +405,49 @@ html { overflow-x: clip; }
 @media (max-width: 991.98px) {
     .brand-logo-img { max-height: 36px; max-width: 150px; }
 }
+
+/* ================= Desktop nav: full-height links, underline on the header border, equal widths ================= */
+@media (min-width: 992px) {
+
+    /* py-3 is !important in Bootstrap, so this needs !important too */
+    .site-header .navbar {
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+    }
+
+    /* Let the nav list run the full height of the header */
+    .site-header .navbar-collapse {
+        align-self: stretch;
+    }
+
+    /* Equal-width columns: the widest item sets the width for all */
+    .main-nav {
+        align-self: stretch;
+        display: grid;
+        grid-auto-flow: column;
+        grid-auto-columns: 1fr;
+    }
+
+    .main-nav .nav-item {
+        display: flex;
+    }
+
+    /* The padding that was on the navbar moves into the links (header stays 72px tall) */
+    .main-nav .nav-link {
+        display: flex;
+        align-items: center;
+        justify-content: center;   /* centers the text (and the chevron on Products) */
+        width: 100%;
+        padding: 1.5rem 1rem;
+        text-align: center;
+        white-space: nowrap;
+    }
+
+    /* Underline sits on the header's bottom border */
+    .main-nav .nav-link::after {
+        left: 0;
+        right: 0;
+        bottom: -1px;   /* covers the header's 1px border-bottom */
+        height: 3px;
+    }
+}

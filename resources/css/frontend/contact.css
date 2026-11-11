@@ -51,7 +51,6 @@
     isolation: isolate;
     overflow: hidden;
     padding: clamp(2.75rem, 6vw, 4.25rem) 0 clamp(6rem, 10vw, 7.5rem);
-    background: var(--ct-ink);
     color: #fff;
 }
 
@@ -306,7 +305,6 @@
 .contact-side-card {
     margin-bottom: 1.25rem;
     padding: 1.5rem;
-    background: #fff;
     border: 1px solid var(--ct-line);
     border-radius: 14px;
 }
@@ -324,7 +322,6 @@
     isolation: isolate;
     overflow: hidden;
     border: 0;
-    background: var(--ct-ink);
     color: #fff;
 }
 

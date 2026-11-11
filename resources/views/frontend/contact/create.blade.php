@@ -121,7 +121,7 @@
 <div class="contact-page">
 
     {{-- Header --}}
-    <section class="contact-hero">
+    <section class="contact-hero dark">
         <div class="container ct-in">
             <nav class="ct-crumbs" aria-label="Breadcrumb" style="--i:0"><a href="{{ url('/') }}">Home</a> / Contact us</nav>
             <h1 style="--i:1">Contact our IT supply team in Dubai</h1>
@@ -273,7 +273,7 @@
             </div>
 
             <aside class="col-lg-5" data-reveal style="--d:.12s">
-                <div class="contact-side-card contact-cta">
+                <div class="contact-side-card contact-cta dark">
                     <div class="contact-side-title">Need prices fast?</div>
                     <p>Pick your products and send us a quotation request in a couple of minutes.</p>
                     <div class="d-grid gap-2">
