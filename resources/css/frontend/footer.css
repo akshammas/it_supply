@@ -1,18 +1,345 @@
+/* =====================================================================
+   SITE FOOTER
+   Imported from resources/css/frontend.css. Markup: frontend/partials/footer.blade.php
+   Classes are prefixed sf-. No web fonts or external files.
+   ===================================================================== */
+
 footer.site-footer {
-    background: #16181A;
-    color: #b8bcc2;
+    --sf-ink: #16181A;
+    --sf-text: #b8bcc2;
+    --sf-steel: #9aa6b4;
+    --sf-line: rgba(255, 255, 255, .11);
+    --sf-red: var(--brand-red, #E4002B);
+    --sf-ease: cubic-bezier(.2, .7, .2, 1);
+    background: var(--sf-ink);
+    color: var(--sf-text);
+    padding-top: clamp(2rem, 5vw, 3.25rem);
 }
 
 footer.site-footer h5,
-footer.site-footer h6 {
+footer.site-footer h6,
+footer.site-footer h2 {
     color: #fff;
 }
 
-footer.site-footer a {
-    color: #b8bcc2;
+footer.site-footer a:not(.btn) {
+    color: var(--sf-text);
     text-decoration: none;
+    transition: color .2s;
 }
 
-footer.site-footer a:hover {
-    color: var(--brand-red);
+footer.site-footer a:not(.btn):hover {
+    color: var(--sf-red);
+}
+
+footer.site-footer a:focus-visible {
+    outline: 2px solid var(--sf-red);
+    outline-offset: 3px;
+}
+
+footer.site-footer ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+/* ---- Call to action ---- */
+.sf-cta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.25rem 2rem;
+    padding: clamp(1.4rem, 3vw, 2.1rem);
+    border: 1px solid var(--sf-line);
+    border-radius: 16px;
+    background: var(--bl-line-dark);
+}
+
+.sf-cta-title {
+    margin: 0 0 .35rem;
+    font-size: clamp(1.25rem, 2.4vw, 1.65rem);
+    font-weight: 700;
+    letter-spacing: -.015em;
+}
+
+.sf-cta-text {
+    margin: 0;
+    color: var(--sf-steel);
+}
+
+.sf-cta-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .75rem;
+}
+
+.sf-cta .btn {
+    transition: transform .25s var(--sf-ease), box-shadow .25s var(--sf-ease), background-color .25s, border-color .25s;
+}
+
+.sf-cta .btn:hover {
+    transform: translateY(-2px);
+}
+
+.sf-cta .btn-brand:hover {
+    box-shadow: 0 14px 28px -14px rgba(228, 0, 43, .6);
+}
+
+.sf-cta .btn-wa {
+    border-color: #25D366;
+    color: #fff;
+    font-weight: 600;
+}
+
+.sf-cta .btn-wa:hover,
+.sf-cta .btn-wa:focus-visible {
+    border-color: #1ebe5b;
+    background: #1ebe5b;
+    color: #0b1017;
+    box-shadow: 0 14px 28px -14px rgba(37, 211, 102, .6);
+}
+
+.sf-cta .btn-wa i {
+    margin-right: .45rem;
+}
+
+/* ---- Trust points ---- */
+footer.site-footer .sf-trust {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.25rem 1.5rem;
+    padding: 2rem 0;
+    border-bottom: 1px solid var(--sf-line);
+}
+
+.sf-trust li {
+    display: flex;
+    align-items: flex-start;
+    gap: .85rem;
+}
+
+.sf-trust i {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 2.6rem;
+    height: 2.6rem;
+    border-radius: 10px;
+    background: var(--brand-red-dark);
+    font-size: 1.2rem;
+    color: #fff;
+}
+
+.sf-trust strong {
+    display: block;
+    font-size: .95rem;
+    font-weight: 600;
+    color: #fff;
+}
+
+.sf-trust span {
+    display: block;
+    font-size: .85rem;
+    line-height: 1.45;
+    color: var(--sf-steel);
+}
+
+/* ---- Main columns ---- */
+.sf-main {
+    padding-top: clamp(2rem, 4vw, 3rem);
+    padding-bottom: 2rem;
+}
+
+footer.site-footer a.sf-brand {
+    display: inline-block;
+    margin-bottom: .9rem;
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: -.02em;
+    color: #fff;
+}
+
+footer.site-footer a.sf-brand span {
+    color: var(--sf-red);
+}
+
+.sf-about {
+    max-width: 38ch;
+    margin-bottom: 1.25rem;
+    font-size: .92rem;
+    line-height: 1.7;
+}
+
+.sf-title {
+    margin-bottom: 1rem;
+    font-size: .8rem;
+    font-weight: 700;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+}
+
+.sf-links li {
+    margin-bottom: .55rem;
+}
+
+.sf-links a {
+    display: inline-block;
+    font-size: .92rem;
+    transition: color .2s, transform .25s var(--sf-ease);
+}
+
+.sf-links a:hover {
+    transform: translateX(3px);
+}
+
+footer.site-footer .sf-links a.sf-more {
+    margin-top: .25rem;
+    font-weight: 600;
+    color: #fff;
+}
+
+.sf-links a.sf-more i {
+    margin-left: .3rem;
+    font-size: .8em;
+}
+
+/* ---- Social icons ---- */
+.sf-social {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .6rem;
+}
+
+footer.site-footer .sf-social a {
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border: 1px solid var(--sf-line);
+    border-radius: 50%;
+    font-size: 1.05rem;
+    color: #fff;
+    transition: background-color .25s, border-color .25s, transform .25s var(--sf-ease);
+}
+
+footer.site-footer .sf-social a:hover {
+    border-color: var(--sf-red);
+    background: var(--sf-red);
+    color: #fff;
+    transform: translateY(-3px);
+}
+
+/* ---- Contact list ---- */
+.sf-contact li {
+    display: flex;
+    align-items: flex-start;
+    gap: .7rem;
+    margin-bottom: .75rem;
+    font-size: .92rem;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+.sf-contact i {
+    flex: none;
+    margin-top: .15rem;
+    color: var(--sf-red);
+}
+
+/* ---- Brands ---- */
+.sf-brands {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .75rem 1.25rem;
+    margin-top: 2.25rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--sf-line);
+}
+
+.sf-brands-label {
+    font-size: .8rem;
+    font-weight: 700;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+    color: #fff;
+}
+
+.sf-brands ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+}
+
+.sf-brands a {
+    display: inline-block;
+    padding: .3rem .85rem;
+    border: 1px solid var(--sf-line);
+    border-radius: 999px;
+    font-size: .85rem;
+    transition: border-color .2s, color .2s;
+}
+
+footer.site-footer .sf-brands a:hover {
+    border-color: var(--sf-red);
+}
+
+/* ---- Bottom bar ---- */
+.sf-bottom {
+    border-top: 1px solid var(--sf-line);
+    background: rgba(0, 0, 0, .22);
+}
+
+.sf-bottom-in {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: .5rem 1.5rem;
+    padding-block: 1rem;
+    font-size: .85rem;
+}
+
+.sf-bottom-in p {
+    margin: 0;
+}
+
+.sf-top i {
+    margin-right: .4rem;
+}
+
+/* keeps "Back to top" clear of the floating WhatsApp chat button */
+@media (min-width: 576px) {
+    .sf-bottom-in {
+        padding-right: 6rem;
+    }
+}
+
+@media (max-width: 991.98px) {
+    footer.site-footer .sf-trust {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 575.98px) {
+    footer.site-footer .sf-trust {
+        grid-template-columns: 1fr;
+    }
+
+    .sf-cta-actions .btn {
+        flex: 1 1 100%;
+    }
+
+    .sf-bottom-in {
+        justify-content: center;
+        text-align: center;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    footer.site-footer *,
+    footer.site-footer *::before {
+        transition: none !important;
+    }
 }

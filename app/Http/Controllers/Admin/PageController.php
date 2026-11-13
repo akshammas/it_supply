@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Page;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
@@ -25,6 +26,7 @@ class PageController extends Controller
     {
         $data = $this->validated($request);
         $data['slug'] = $data['slug'] ?: Str::slug($data['title']);
+        $data['status'] = $request->boolean('status');
 
         if ($request->hasFile('featured_image')) {
             $data['featured_image'] = $request->file('featured_image')->store('pages', 'public');
@@ -44,9 +46,16 @@ class PageController extends Controller
     {
         $data = $this->validated($request);
         $data['slug'] = $data['slug'] ?: Str::slug($data['title']);
+        $data['status'] = $request->boolean('status');
 
         if ($request->hasFile('featured_image')) {
+            // new upload replaces the old image
+            $this->deleteImage($page);
             $data['featured_image'] = $request->file('featured_image')->store('pages', 'public');
+        } elseif ($request->boolean('remove_image')) {
+            // "Remove image" ticked
+            $this->deleteImage($page);
+            $data['featured_image'] = null;
         }
 
         $page->update($data);
@@ -56,9 +65,17 @@ class PageController extends Controller
 
     public function destroy(Page $page): RedirectResponse
     {
+        $this->deleteImage($page);
         $page->delete();
 
         return redirect()->route('admin.pages.index')->with('status', 'Page deleted.');
+    }
+
+    protected function deleteImage(Page $page): void
+    {
+        if ($page->featured_image) {
+            Storage::disk('public')->delete($page->featured_image);
+        }
     }
 
     protected function validated(Request $request): array

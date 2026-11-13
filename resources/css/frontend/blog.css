@@ -839,3 +839,58 @@
         transition: none;
     }
 }
+/* ---- Single post header: same dark hero as the index ---- */
+.blog-hero .post-head {
+    max-width: 820px;
+}
+
+.blog-hero .post-cat {
+    padding: .3rem .8rem;
+    border: 1px solid rgba(255, 255, 255, .22);
+    border-radius: 6px;
+    background: transparent;
+    color: #fff !important;
+    font-size: .78rem;
+    font-weight: 600;
+    letter-spacing: 0;
+    text-transform: none;
+    transition: background-color .25s, border-color .25s;
+}
+
+.blog-hero .post-cat:hover {
+    background: var(--bl-red);
+    border-color: var(--bl-red);
+    color: #fff !important;
+}
+
+.blog-hero .post-title {
+    margin: 1rem 0;
+    font-family: 'Sora', system-ui, sans-serif;
+    font-size: clamp(1.9rem, 4.4vw, 3.1rem);
+    font-weight: 700;
+    line-height: 1.12;
+    letter-spacing: -.02em;
+    color: #fff;
+}
+
+.blog-hero .post-excerpt {
+    max-width: 62ch;
+    margin-bottom: 1.75rem;
+    font-size: 1.12rem;
+    line-height: 1.65;
+    color: var(--bl-steel);
+}
+
+.blog-hero .post-meta {
+    gap: .5rem 1.5rem;
+    color: var(--bl-steel);
+}
+
+.blog-hero .post-meta i {
+    color: #fff;
+}
+
+.blog-hero .post-author strong {
+    font-weight: 600;
+    color: #fff;
+}

@@ -26,7 +26,15 @@
                 <div class="col-md-6">
                     <label class="form-label">Featured Image</label>
                     <input type="file" name="featured_image" class="form-control" accept="image/*">
-                    @if($page->featured_image)<img src="{{ Storage::url($page->featured_image) }}" class="mt-2 rounded" style="max-height:80px">@endif
+                    @if($page->featured_image)
+                        <div class="mt-2 d-flex align-items-center gap-3">
+                            <img src="{{ Storage::url($page->featured_image) }}" alt="" class="rounded" style="max-height:80px">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="remove_image" value="1" id="remove_image">
+                                <label class="form-check-label small text-danger" for="remove_image">Remove image</label>
+                            </div>
+                        </div>
+                    @endif
                 </div>
                 <div class="col-md-6 d-flex align-items-end">
                     <div class="form-check">

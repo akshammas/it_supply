@@ -116,36 +116,7 @@
     @yield('content')
 </main>
 
-<footer class="site-footer py-5 mt-5 hm-grid">
-    <div class="container">
-        <div class="row g-4">
-            <div class="col-md-4">
-                <h5>{{ \App\Models\Setting::get('company_name', config('app.name')) }}</h5>
-                <p class="small">Enterprise IT products and solutions for businesses across the UAE.</p>
-            </div>
-            <div class="col-md-4">
-                <h6>Quick Links</h6>
-                <ul class="list-unstyled small">
-                    <li class="mb-1"><a href="{{ route('products.index') }}">Products</a></li>
-                    <li class="mb-1"><a href="{{ route('about') }}">about us</a></li>
-                    <li class="mb-1"><a href="{{ route('blog.index') }}">Blog</a></li>
-                    <li class="mb-1"><a href="{{ route('contact.create') }}">Contact</a></li>
-                    @foreach(\App\Models\Page::where('status', true)->orderBy('title')->get() as $footerPage)
-                        <li class="mb-1"><a href="{{ route('pages.show', $footerPage) }}">{{ $footerPage->title }}</a></li>
-                    @endforeach
-                </ul>
-            </div>
-            <div class="col-md-4">
-                <h6>Get in Touch</h6>
-                <p class="small mb-1">{{ \App\Models\Setting::get('address', 'UAE | Dubai') }}</p>
-                @if(\App\Models\Setting::get('email'))<p class="small mb-1">{{ \App\Models\Setting::get('email') }}</p>@endif
-                @if(\App\Models\Setting::get('phone'))<p class="small mb-1">{{ \App\Models\Setting::get('phone') }}</p>@endif
-            </div>
-        </div>
-        <hr style="border-color:#2a2d30;">
-        <p class="small mb-0 text-center">&copy; {{ date('Y') }} {{ \App\Models\Setting::get('company_name', config('app.name')) }}. All rights reserved.</p>
-    </div>
-</footer>
+@include('frontend.partials.footer')
 
 @include('frontend.partials.whatsapp-chat')
 

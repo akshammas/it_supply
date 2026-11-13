@@ -14,28 +14,31 @@
 <div class="read-progress" id="readProgress"></div>
 
 {{-- Header --}}
-<section class="post-hero py-5">
+{{-- Header: same hero as the blog index --}}
+<div class="blog-page">
+<section class="blog-hero dark">
     <div class="container">
-        <div style="max-width:820px;">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb small mb-3">
-                    <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
-                    <li class="breadcrumb-item"><a href="{{ route('blog.index') }}">Blog</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">{{ Str::limit($post->title, 50) }}</li>
-                </ol>
+        <div class="post-head bl-in">
+            <nav class="bl-crumbs" aria-label="Breadcrumb" style="--i:0">
+                <a href="{{ route('home') }}">Home</a> /
+                <a href="{{ route('blog.index') }}">Blog</a> /
+                <span aria-current="page">{{ Str::limit($post->title, 50) }}</span>
             </nav>
 
-            @if($post->category)
-                <a href="{{ route('blog.index', ['category' => $post->category->slug]) }}" class="post-cat">{{ $post->category->name }}</a>
-            @endif
-            <h1 class="post-title mt-2 mb-3">{{ $post->title }}</h1>
-            @if($post->excerpt)<p class="lead text-muted mb-4">{{ $post->excerpt }}</p>@endif
+            <div style="--i:1">
+                @if($post->category)
+                    <a href="{{ route('blog.index', ['category' => $post->category->slug]) }}" class="post-cat">{{ $post->category->name }}</a>
+                @endif
+            </div>
 
-            <div class="post-meta">
+            <h1 class="post-title" style="--i:2">{{ $post->title }}</h1>
+            @if($post->excerpt)<p class="post-excerpt" style="--i:3">{{ $post->excerpt }}</p>@endif
+
+            <div class="post-meta" style="--i:4">
                 @if($post->author)
                     <span class="post-author">
                         <span class="post-avatar">{{ strtoupper(mb_substr($post->author->name, 0, 1)) }}</span>
-                        <strong class="text-dark">{{ $post->author->name }}</strong>
+                        <strong>{{ $post->author->name }}</strong>
                     </span>
                 @endif
                 @if($post->published_at)<span><i class="bi bi-calendar3"></i>{{ $post->published_at->format('d M Y') }}</span>@endif
@@ -44,6 +47,7 @@
         </div>
     </div>
 </section>
+</div>
 
 {{-- Article + sidebar --}}
 <section class="container py-5">
