@@ -220,6 +220,101 @@
         min-height: 0;
     }
 }
+/* Promo banners: gentle zoom and darken on hover */
+.promo-strip a img {
+    transition: transform .45s ease, filter .45s ease;
+}
+.promo-track::-webkit-scrollbar {
+    display: none;
+}
+
+.promo-strip a:hover img,
+.promo-strip a:focus-visible img {
+    transform: scale(1.04);
+    filter: brightness(.88);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .promo-strip a img {
+        transition: filter .45s ease;
+    }
+
+    .promo-strip a:hover img,
+    .promo-strip a:focus-visible img {
+        transform: none;
+    }
+}
+/* Promo banners: two per view on tablet/desktop, one on phones; the rest scroll sideways */
+.promo-wrap {
+    position: relative;
+}
+
+.promo-track {
+    display: flex;
+    gap: 1.5rem;
+    padding-bottom: .5rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;  
+    -webkit-overflow-scrolling: touch;
+}
+
+.promo-item {
+    flex: 0 0 100%;      /* was 88%, which let the next banner peek in */
+    min-width: 0;
+    scroll-snap-align: start;
+}
+
+@media (min-width: 768px) {
+    .promo-item {
+        flex-basis: calc((100% - 1.5rem) / 2);
+    }
+}
+
+/* one banner only: full width, as before */
+.promo-track.is-single .promo-item {
+    flex-basis: 100%;
+}
+
+.promo-nav {
+    position: absolute;
+    top: calc(50% - .25rem);
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 8px 22px -8px rgba(11, 16, 23, .45);
+    color: var(--ink, #0b1017);
+    transform: translateY(-50%);
+    transition: opacity .25s, background-color .25s, color .25s;
+}
+
+.promo-nav[hidden] {
+    display: none;
+}
+
+.promo-nav:hover:not(:disabled) {
+    background: var(--brand-red, #e4002b);
+    color: #fff;
+}
+
+.promo-nav:disabled {
+    opacity: .35;
+    cursor: default;
+}
+
+.promo-prev {
+    left: .5rem;
+}
+
+.promo-next {
+    right: .5rem;
+}
 
 /* =====================================================================
    HOME PAGE ADDITIONS
@@ -591,7 +686,33 @@
     height: auto;
     background: var(--hm-mist);
 }
+/* Dubai areas under the delivery map */
+.hm-areas {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .4rem .5rem;
+    padding: .9rem 1.1rem 1.1rem;
+    background: var(--hm-mist);
+}
 
+.hm-areas-label {
+    margin-right: .25rem;
+    font-size: .75rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--hm-ink, #0b1017);
+}
+
+.hm-areas span:not(.hm-areas-label) {
+    padding: .25rem .7rem;
+    border: 1px solid var(--hm-line);
+    border-radius: 999px;
+    background: #fff;
+    font-size: .82rem;
+    color: var(--hm-text, #18202a);
+}
 .hm-route {
     animation: hmDash 1.2s linear infinite;
 }

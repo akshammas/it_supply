@@ -51,7 +51,7 @@
                 <li class="nav-item position-static" id="productsMegaWrap">
                     <a class="nav-link d-flex align-items-center gap-1 {{ request()->routeIs('products.*', 'categories.*', 'brands.*') ? 'active' : '' }}"
                         href="{{ route('products.index') }}" id="productsMegaToggle">
-                            Products <i class="bi bi-chevron-down small"></i>
+                            Products <i class="bi bi-caret-down-fill small"></i>
                     </a>
                     <div class="mega-menu" id="productsMega">
                         <div class="container">

@@ -136,14 +136,6 @@
     {{-- Contact cards --}}
     <section class="container contact-cards">
         <div class="row g-3">
-            <div class="col-sm-6 col-lg" data-reveal>
-                <div class="contact-card">
-                    <div class="contact-icon"><i class="bi bi-geo-alt"></i></div>
-                    <h2>Visit us</h2>
-                    <p>{{ $address }}</p>
-                    <a href="{{ $mapsUrl }}" target="_blank" rel="noopener" class="contact-link stretched-link">Get directions</a>
-                </div>
-            </div>
 
             @if($phone)
                 <div class="col-sm-6 col-lg" data-reveal style="--d:.08s">

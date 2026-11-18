@@ -99,7 +99,6 @@
     right: 0;
     top: 100%;
     background: #fff;
-    border-top: 3px solid var(--brand-red);
     border-radius: 0 0 16px 16px;
     box-shadow: 0 24px 48px -12px rgba(16, 24, 40, .18);
     padding: 1.25rem 0 1.5rem;

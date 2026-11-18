@@ -172,38 +172,68 @@
         })();
     </script>
 
-    {{-- PROMO BANNERS --}}
+{{-- PROMO BANNERS: two per view, the rest scroll sideways --}}
     @if($promoBanners->isNotEmpty())
         <section class="container py-3 promo-strip">
-            <div class="row justify-content-center">
-                @foreach($promoBanners as $banner)
-                    @php
-                        // Real size of the uploaded image (falls back to 2:1 if it can't be read)
-                        $file = Storage::disk('public')->path($banner->image);
-                        $size = is_file($file) ? @getimagesize($file) : false;
-                        $w = $size[0] ?? 800;
-                        $h = $size[1] ?? 400;
-                    @endphp
-                    <div class="col-12 col-md-{{ 12 / min($promoBanners->count(), 3) }} mb-3">
-                        <a href="{{ $banner->link_url ?: '#' }}"
-                           class="d-block position-relative overflow-hidden rounded text-decoration-none">
-                            <img src="{{ Storage::url($banner->image) }}"
-                                 alt="{{ $banner->title ?? 'Promotion' }}"
-                                 class="img-fluid w-100 d-block"
-                                 width="{{ $w }}" height="{{ $h }}"
-                                 loading="lazy" decoding="async"
-                                 style="aspect-ratio: {{ $w }} / {{ $h }};">
-                            @if($banner->title)
-                                <div class="position-absolute bottom-0 start-0 w-100 p-3 text-white"
-                                     style="background:linear-gradient(transparent, rgba(0,0,0,.65));">
-                                    <div class="fw-semibold">{{ $banner->title }}</div>
-                                </div>
-                            @endif
-                        </a>
-                    </div>
-                @endforeach
+            <div class="promo-wrap" id="promoWrap">
+                <div class="promo-track {{ $promoBanners->count() === 1 ? 'is-single' : '' }}" id="promoTrack" tabindex="0" aria-label="Promotions">
+                    @foreach($promoBanners as $banner)
+                        @php
+                            // Real size of the uploaded image (falls back to 2:1 if it can't be read)
+                            $file = Storage::disk('public')->path($banner->image);
+                            $size = is_file($file) ? @getimagesize($file) : false;
+                            $w = $size[0] ?? 800;
+                            $h = $size[1] ?? 400;
+                        @endphp
+                        <div class="promo-item">
+                            <a href="{{ $banner->link_url ?: '#' }}"
+                               class="d-block position-relative overflow-hidden rounded text-decoration-none">
+                                <img src="{{ Storage::url($banner->image) }}"
+                                     alt="{{ $banner->title ?? 'Promotion' }}"
+                                     class="img-fluid w-100 d-block"
+                                     width="{{ $w }}" height="{{ $h }}"
+                                     loading="lazy" decoding="async"
+                                     style="aspect-ratio: {{ $w }} / {{ $h }};">
+                                @if($banner->title)
+                                    <div class="position-absolute bottom-0 start-0 w-100 p-3 text-white"
+                                         style="background:linear-gradient(transparent, rgba(0,0,0,.65));">
+                                        <div class="fw-semibold">{{ $banner->title }}</div>
+                                    </div>
+                                @endif
+                            </a>
+                        </div>
+                    @endforeach
+                </div>
+                <button type="button" class="promo-nav promo-prev" aria-label="Previous promotions" hidden><i class="bi bi-chevron-left"></i></button>
+                <button type="button" class="promo-nav promo-next" aria-label="Next promotions" hidden><i class="bi bi-chevron-right"></i></button>
             </div>
         </section>
+        <script>
+            (function () {
+                var track = document.getElementById('promoTrack');
+                var wrap = document.getElementById('promoWrap');
+                if (!track || !wrap) return;
+                var prev = wrap.querySelector('.promo-prev');
+                var next = wrap.querySelector('.promo-next');
+                function update() {
+                    var max = track.scrollWidth - track.clientWidth;
+                    var scrollable = max > 4;
+                    prev.hidden = next.hidden = !scrollable;
+                    prev.disabled = track.scrollLeft <= 4;
+                    next.disabled = track.scrollLeft >= max - 4;
+                }
+                function step(dir) {
+                    var item = track.querySelector('.promo-item');
+                    var gap = parseFloat(getComputedStyle(track).columnGap) || 0;
+                    track.scrollBy({ left: dir * (item.offsetWidth + gap), behavior: 'smooth' });
+                }
+                prev.addEventListener('click', function () { step(-1); });
+                next.addEventListener('click', function () { step(1); });
+                track.addEventListener('scroll', update, { passive: true });
+                window.addEventListener('resize', update);
+                update();
+            })();
+        </script>
     @endif
 
     {{-- TOP BRANDS: grid, max 5 per row --}}
@@ -388,24 +418,62 @@
                     @if($deliveryImg)
                         <div class="hm-photo"><img src="{{ $deliveryImg }}" width="960" height="720" loading="lazy" decoding="async" alt="IT equipment ready for delivery from {{ $company }}"></div>
                     @else
-                        {{-- Fallback illustration: route from Dubai to a customer site --}}
+                        {{-- Fallback illustration: Dubai hub with delivery routes to the main UAE cities --}}
+                        @php
+                            // Edit these lists to change the map. Coordinates are for the 560 x 380 drawing.
+                            $uaeRoutes = [
+                                'M70 300 C120 300 150 230 225 215',            // Abu Dhabi
+                                'M225 215 L290 170 L345 135 L400 105 L470 70', // Sharjah, Ajman, Umm Al Quwain, Ras Al Khaimah
+                                'M225 215 C300 235 400 190 500 235',           // Fujairah
+                                'M225 215 C250 290 280 310 335 320',           // Al Ain
+                            ];
+                            // [name, dot x, dot y, label x, label y, label anchor]
+                            $uaeCities = [
+                                ['Abu Dhabi',      70, 300,  70, 330, 'middle'],
+                                ['Sharjah',       290, 170, 302, 192, 'start'],
+                                ['Ajman',         345, 135, 357, 157, 'start'],
+                                ['Umm Al Quwain', 400, 105, 412, 127, 'start'],
+                                ['Ras Al Khaimah',470,  70, 482,  50, 'end'],
+                                ['Fujairah',      500, 235, 500, 264, 'middle'],
+                                ['Al Ain',        335, 320, 335, 350, 'middle'],
+                            ];
+                            // Dubai areas shown under the map
+                            $dubaiAreas = ['Deira', 'Bur Dubai', 'Business Bay', 'Downtown', 'Al Quoz', 'Jebel Ali', 'Silicon Oasis', 'Internet City'];
+                        @endphp
                         <div class="hm-photo hm-art">
-                            <svg viewBox="0 0 560 380" role="img" aria-label="Illustration of a delivery route from Dubai to a customer site">
+                            <svg viewBox="0 0 560 380" role="img" aria-label="Map of delivery routes from Dubai to Abu Dhabi, Sharjah, Ajman, Umm Al Quwain, Ras Al Khaimah, Fujairah and Al Ain">
                                 @foreach(range(1, 8) as $g)
                                     <line x1="{{ $g * 62 }}" y1="0" x2="{{ $g * 62 }}" y2="380" stroke="#e2e6ea"/>
                                 @endforeach
                                 @foreach(range(1, 5) as $g)
                                     <line x1="0" y1="{{ $g * 62 }}" x2="560" y2="{{ $g * 62 }}" stroke="#e2e6ea"/>
                                 @endforeach
-                                <path d="M90 300 C190 300 190 160 300 175 S440 95 475 80" fill="none" stroke="#cfd5db" stroke-width="3" stroke-linecap="round"/>
-                                <path class="hm-route" d="M90 300 C190 300 190 160 300 175 S440 95 475 80" fill="none" style="stroke:var(--brand-red,#e4002b)" stroke-width="3" stroke-linecap="round" stroke-dasharray="8 10"/>
-                                <circle cx="90" cy="300" r="11" fill="#0b1017"/>
-                                <circle cx="90" cy="300" r="4" fill="#fff"/>
-                                <circle class="hm-pulse" cx="475" cy="80" r="11" style="fill:var(--brand-red,#e4002b)"/>
-                                <circle cx="475" cy="80" r="4" fill="#fff"/>
-                                <text x="108" y="336" font-size="15" font-weight="600" fill="#0b1017">Dubai</text>
-                                <text x="395" y="58" font-size="15" font-weight="600" fill="#0b1017">Your site</text>
+
+                                @foreach($uaeRoutes as $d)
+                                    <path d="{{ $d }}" fill="none" stroke="#cfd5db" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path class="hm-route" d="{{ $d }}" fill="none" style="stroke:var(--brand-red,#e4002b)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="8 10"/>
+                                @endforeach
+
+                                @foreach($uaeCities as [$name, $cx, $cy, $tx, $ty, $anchor])
+                                    <circle cx="{{ $cx }}" cy="{{ $cy }}" r="9" fill="#0b1017"/>
+                                    <circle cx="{{ $cx }}" cy="{{ $cy }}" r="3.5" fill="#fff"/>
+                                    <text x="{{ $tx }}" y="{{ $ty }}" text-anchor="{{ $anchor }}" font-size="14" font-weight="600" fill="#0b1017">{{ $name }}</text>
+                                @endforeach
+
+                                <text x="24" y="40" font-size="16" font-weight="700" fill="#0b1017">Delivery across the UAE</text>
+
+                                {{-- Dubai: the hub --}}
+                                <circle class="hm-pulse" cx="225" cy="215" r="16" style="fill:var(--brand-red,#e4002b)"/>
+                                <circle cx="225" cy="215" r="12" style="fill:var(--brand-red,#e4002b)"/>
+                                <circle cx="225" cy="215" r="4.5" fill="#fff"/>
+                                <text x="210" y="196" text-anchor="end" font-size="18" font-weight="700" fill="#0b1017">Dubai</text>
                             </svg>
+                            <div class="hm-areas">
+                                <span class="hm-areas-label">Dubai areas</span>
+                                @foreach($dubaiAreas as $area)
+                                    <span>{{ $area }}</span>
+                                @endforeach
+                            </div>
                         </div>
                     @endif
                 </div>
